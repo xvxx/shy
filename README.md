@@ -4,6 +4,15 @@
 parses your `~/.ssh/config` file and displays all your "Host" patterns,
 allowing you to quickly select one using a readline-ish prompt.
 
+## Keyboard Shortcuts
+
+| **Shortcut**     | **Nav Mode**        | **Search Mode**                    |
+| ---------------- | ------------------- | ---------------------------------- |
+| `i`, `s`         | Enter search mode   |                                    |
+| `ctrl-c`, `ESC`  | Quit                | Clear Input, then Exit Search Mode |
+| `up`, `ctrl-p`   | Move selection up   | Jump to previous match             |
+| `down`, `ctrl-n` | Move selection down | Jump to next match                 |
+
 ## TODO
 
 ### Core

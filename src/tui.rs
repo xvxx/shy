@@ -98,7 +98,7 @@ impl TUI {
         }
 
         match event.unwrap() {
-            Key::Ctrl('c') if self.mode == Mode::Nav => self.mode = Mode::Quit,
+            Key::Ctrl('c') | Key::Esc if self.mode == Mode::Nav => self.mode = Mode::Quit,
             Key::Up | Key::Ctrl('p') => {
                 if self.selected == 0 {
                     self.selected = self.hosts.len() - 1;
