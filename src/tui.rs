@@ -91,7 +91,8 @@ impl TUI {
         }
 
         match event.unwrap() {
-            Key::Char('q') | Key::Ctrl('c') => self.mode = Mode::Quit,
+            Key::Char('q') => self.mode = Mode::Quit,
+            Key::Ctrl('c') if self.mode == Mode::Navigate => self.mode = Mode::Quit,
             Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
             Key::Up | Key::Ctrl('p') => {
                 if self.selected == 0 {
@@ -114,26 +115,31 @@ impl TUI {
                     return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
                 }
             }
-            event if self.mode == Mode::Search => match event {
-                Key::Ctrl('c') | Key::Esc => {
-                    self.input.clear();
-                    self.mode = Mode::Navigate;
-                }
-                Key::Backspace => {
-                    if !self.input.is_empty() {
-                        self.input.truncate(self.input.len() - 1);
-                    }
-                }
-                Key::Char(c) => {
-                    self.input.push(c);
-                    self.search_for_host();
-                }
-                _ => {}
-            },
+            event if self.mode == Mode::Search => self.update_input(event),
             _ => {}
         }
 
         Ok(())
+    }
+
+    /// Search mode-specific keybindings.
+    fn update_input(&mut self, event: Key) {
+        match event {
+            Key::Ctrl('c') | Key::Esc => {
+                self.input.clear();
+                self.mode = Mode::Navigate;
+            }
+            Key::Backspace => {
+                if !self.input.is_empty() {
+                    self.input.truncate(self.input.len() - 1);
+                }
+            }
+            Key::Char(c) => {
+                self.input.push(c);
+                self.search_for_host();
+            }
+            _ => {}
+        }
     }
 
     /// Draw the ui
