@@ -66,21 +66,22 @@ impl TUI {
         Ok(())
     }
 
-    /// Main loop.
-    pub fn run(&mut self) -> Result<(), io::Error> {
+    /// Main loop. Returns the host we want to SSH to, if any.
+    pub fn run(&mut self) -> Result<Option<String>, io::Error> {
         self.hosts = load_ssh_config()?;
         self.update(None)?;
         self.draw()?;
 
         while let Some(Ok(event)) = io::stdin().keys().next() {
             self.update(Some(event))?;
-            if self.mode == Mode::Quit {
-                break;
+            match self.mode {
+                Mode::Quit => break,
+                Mode::Launch(ref host) => return Ok(Some(host.clone())),
+                _ => self.draw()?,
             }
-            self.draw()?;
         }
 
-        Ok(())
+        Ok(None)
     }
 
     /// Update our state in response to key presses.
@@ -88,36 +89,32 @@ impl TUI {
         if event.is_none() {
             return Ok(());
         }
-        let event = event.unwrap();
 
-        match self.mode {
-            Mode::Navigate => match event {
-                Key::Char('q') | Key::Ctrl('c') => self.mode = Mode::Quit,
-                Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
-                Key::Up | Key::Ctrl('p') => {
-                    if self.selected == 0 {
-                        self.selected = self.hosts.len() - 1;
-                    } else {
-                        self.selected -= 1;
-                    }
+        match event.unwrap() {
+            Key::Char('q') | Key::Ctrl('c') => self.mode = Mode::Quit,
+            Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
+            Key::Up | Key::Ctrl('p') => {
+                if self.selected == 0 {
+                    self.selected = self.hosts.len() - 1;
+                } else {
+                    self.selected -= 1;
                 }
-                Key::Down | Key::Ctrl('n') => {
-                    if self.selected >= self.hosts.len() - 1 {
-                        self.selected = 0;
-                    } else {
-                        self.selected += 1;
-                    }
+            }
+            Key::Down | Key::Ctrl('n') => {
+                if self.selected >= self.hosts.len() - 1 {
+                    self.selected = 0;
+                } else {
+                    self.selected += 1;
                 }
-                Key::Char('\n') => {
-                    if let Some(host) = self.hosts.iter().nth(self.selected) {
-                        self.mode = Mode::Launch(host.0.clone());
-                    } else {
-                        return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
-                    }
+            }
+            Key::Char('\n') => {
+                if let Some(host) = self.hosts.iter().nth(self.selected) {
+                    self.mode = Mode::Launch(host.0.clone());
+                } else {
+                    return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
                 }
-                _ => {}
-            },
-            Mode::Search => match event {
+            }
+            event if self.mode == Mode::Search => match event {
                 Key::Ctrl('c') | Key::Esc => {
                     self.input.clear();
                     self.mode = Mode::Navigate;
@@ -125,13 +122,6 @@ impl TUI {
                 Key::Backspace => {
                     if !self.input.is_empty() {
                         self.input.truncate(self.input.len() - 1);
-                    }
-                }
-                Key::Char('\n') => {
-                    if let Some(host) = self.hosts.iter().nth(self.selected) {
-                        self.mode = Mode::Launch(host.0.clone());
-                    } else {
-                        return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
                     }
                 }
                 Key::Char(c) => {

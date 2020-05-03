@@ -17,9 +17,7 @@ fn run() -> Result<Option<String>, io::Error> {
     setup_panic_hook();
 
     let mut app = App::new()?;
-    app.run()?;
-
-    Ok(None)
+    Ok(app.run()?)
 }
 
 /// We need to cleanup the terminal before exiting, even on panic!
