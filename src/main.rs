@@ -20,6 +20,12 @@ use termion::{
     terminal_size,
 };
 
+#[derive(Debug, Clone, PartialEq)]
+enum InputMode {
+    Search,
+    Navigate,
+}
+
 fn main() -> Result<(), io::Error> {
     if let Some(hostname) = run()? {
         std::env::set_var("TERM", "xterm");
@@ -38,41 +44,70 @@ fn run() -> Result<Option<String>, io::Error> {
     setup_panic_hook();
 
     let mut selected = 0;
+    let mut mode = InputMode::Navigate;
+    let mut input = String::new();
+
     update()?;
-    draw(&hosts, selected)?;
+    draw(&hosts, selected, "")?;
 
     while let Some(Ok(event)) = io::stdin().keys().next() {
         write!(stdout, "{}{}event: {:?}", Goto(1, 7), ClearLine, event)?;
         stdout.flush()?;
 
-        match event {
-            Key::Char('q') | Key::Ctrl('c') => break,
-            Key::Up | Key::Ctrl('p') => {
-                if selected == 0 {
-                    selected = hosts.len() - 1;
-                } else {
-                    selected -= 1;
+        match mode {
+            InputMode::Navigate => match event {
+                Key::Char('q') | Key::Ctrl('c') => break,
+                Key::Char('i') | Key::Char('s') => mode = InputMode::Search,
+                Key::Up | Key::Ctrl('p') => {
+                    if selected == 0 {
+                        selected = hosts.len() - 1;
+                    } else {
+                        selected -= 1;
+                    }
                 }
-            }
-            Key::Down | Key::Ctrl('n') => {
-                if selected >= hosts.len() - 1 {
-                    selected = 0;
-                } else {
-                    selected += 1;
+                Key::Down | Key::Ctrl('n') => {
+                    if selected >= hosts.len() - 1 {
+                        selected = 0;
+                    } else {
+                        selected += 1;
+                    }
                 }
-            }
-            Key::Char('\n') => {
-                if let Some(host) = hosts.iter().nth(selected) {
-                    shutdown_terminal()?;
-                    return Ok(Some(host.0.clone()));
-                } else {
-                    panic!("can't find host");
+                Key::Char('\n') => {
+                    if let Some(host) = hosts.iter().nth(selected) {
+                        shutdown_terminal()?;
+                        return Ok(Some(host.0.clone()));
+                    } else {
+                        panic!("can't find host");
+                    }
                 }
-            }
-            _ => {}
+                _ => {}
+            },
+            InputMode::Search => match event {
+                Key::Ctrl('c') | Key::Esc => {
+                    input.clear();
+                    mode = InputMode::Navigate;
+                }
+                Key::Backspace => {
+                    if !input.is_empty() {
+                        input.truncate(input.len() - 1);
+                    }
+                }
+                Key::Char('\n') => {
+                    if let Some(host) = hosts.iter().nth(selected) {
+                        shutdown_terminal()?;
+                        return Ok(Some(host.0.clone()));
+                    } else {
+                        panic!("can't find host");
+                    }
+                }
+                Key::Char(c) => {
+                    input.push(c);
+                }
+                _ => {}
+            },
         }
 
-        draw(&hosts, selected)?;
+        draw(&hosts, selected, &input)?;
     }
 
     shutdown_terminal()?;
@@ -115,14 +150,24 @@ fn update() -> Result<(), io::Error> {
 }
 
 /// Draw the app.
-fn draw(hosts: &HostMap, selected: usize) -> Result<(), io::Error> {
-    let (cols, _rows) = terminal_size()?;
+fn draw(hosts: &HostMap, selected: usize, input: &str) -> Result<(), io::Error> {
+    let (_cols, rows) = terminal_size()?;
     let mut stdout = io::stdout();
+
+    let prompt = format!(
+        "{}{}{}{}",
+        Goto(1, rows - 2),
+        ClearLine,
+        color_string!(">> ", Bold, White),
+        input
+    );
+
     write!(
         stdout,
-        "{}{}{}{}{}{}",
+        "{}{}{}{}{}{}{}",
         ClearAll,
-        Goto(1, cols - 1),
+        prompt,
+        Goto(1, rows - 1),
         color!(MagentaBG),
         color!(Yellow),
         ClearLine,
