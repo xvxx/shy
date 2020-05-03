@@ -4,10 +4,6 @@ use std::{io, os::unix::process::CommandExt, panic, process::Command};
 fn main() -> Result<(), io::Error> {
     let args = parse_args()?;
 
-    if args.is_empty() {
-        return print_usage();
-    }
-
     for arg in args {
         match arg.as_ref() {
             "-h" | "-help" | "--help" => return print_usage(),
