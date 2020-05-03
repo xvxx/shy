@@ -171,7 +171,7 @@ impl TUI {
             color_string!("shy", MagentaBG, Yellow, Bold)
         )?;
 
-        let mut row = 3;
+        let mut row = 1;
         for (i, (host, _config)) in self.hosts.iter().enumerate() {
             write!(
                 stdout,
