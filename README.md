@@ -6,13 +6,13 @@ allowing you to quickly select one using a readline-ish prompt.
 
 ## Keyboard Shortcuts
 
-| **Shortcut**     | **Nav Mode**        | **Search Mode**                    |
-| ---------------- | ------------------- | ---------------------------------- |
-| `i`, `s`         | Enter search mode   |                                    |
-| `r`              | Refresh             |                                    |
-| `ctrl-c`, `ESC`  | Quit                | Clear Input, then Exit Search Mode |
-| `up`, `ctrl-p`   | Move selection up   | Jump to previous match             |
-| `down`, `ctrl-n` | Move selection down | Jump to next match                 |
+| **Shortcut**       | **Nav Mode**        | **Search Mode**                    |
+| ------------------ | ------------------- | ---------------------------------- |
+| `i`, `s`, `f`, `/` | Enter search mode   |                                    |
+| `r`                | Refresh             |                                    |
+| `ctrl-c`, `ESC`    | Quit                | Clear Input, then Exit Search Mode |
+| `up`, `ctrl-p`     | Move selection up   | Jump to previous match             |
+| `down`, `ctrl-n`   | Move selection down | Jump to next match                 |
 
 ## TODO
 
