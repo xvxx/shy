@@ -11,16 +11,11 @@ project is mostly for fun, and to provide a some funky visuals.
 
 ### Core
 
-- [x] parse .ssh/config
 - [ ] correctly parse .ssh/config
-- [x] display hosts in a TUI
-- [x] up/down between hosts
 - [ ] readline prompt
-- [ ] input mode
 - [ ] jump to host based on prompt
 - [ ] fancy, fish-colored prompt
-- [x] ENTER to connect to host
-- [ ] show actual hostnames in 2nd column
+- [ ] show actual hostnames in status bar
 
 ### Fancy
 

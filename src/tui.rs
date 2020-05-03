@@ -1,10 +1,8 @@
-use crate::ssh_config::{load_ssh_config, HostMap};
-use std::{
-    io::{self, Stdout, Write},
-    os::unix::process::CommandExt,
-    panic,
-    process::Command,
+use crate::{
+    color,
+    ssh_config::{load_ssh_config, HostMap},
 };
+use std::io::{self, Stdout, Write};
 use termion::{
     clear::{All as ClearAll, CurrentLine as ClearLine},
     cursor::{Goto, Hide as HideCursor, Show as ShowCursor},
@@ -18,6 +16,7 @@ use termion::{
 /// App state.
 pub struct TUI {
     mode: Mode,
+    status: SearchStatus,
     input: String,
     selected: usize,
     hosts: HostMap,
@@ -33,11 +32,19 @@ pub enum Mode {
     Launch(String),
 }
 
+/// Was the input search successful?
+pub enum SearchStatus {
+    Blank,
+    Found,
+    Missed,
+}
+
 impl TUI {
     /// Create a new main view and sets up the terminal.
     pub fn new() -> Result<TUI, io::Error> {
         Ok(TUI {
             mode: Mode::Nav,
+            status: SearchStatus::Blank,
             input: String::new(),
             selected: 0,
             hosts: HostMap::new(),
@@ -91,9 +98,7 @@ impl TUI {
         }
 
         match event.unwrap() {
-            Key::Char('q') => self.mode = Mode::Quit,
             Key::Ctrl('c') if self.mode == Mode::Nav => self.mode = Mode::Quit,
-            Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
             Key::Up | Key::Ctrl('p') => {
                 if self.selected == 0 {
                     self.selected = self.hosts.len() - 1;
@@ -115,6 +120,11 @@ impl TUI {
                     return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
                 }
             }
+            event if self.mode == Mode::Nav => match event {
+                Key::Char('q') => self.mode = Mode::Quit,
+                Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
+                _ => {}
+            },
             event if self.mode == Mode::Search => self.update_input(event),
             _ => {}
         }
@@ -125,13 +135,25 @@ impl TUI {
     /// Search mode-specific keybindings.
     fn update_input(&mut self, event: Key) {
         match event {
-            Key::Ctrl('c') | Key::Esc => {
+            Key::Ctrl('c') => {
                 self.input.clear();
+                self.status = SearchStatus::Blank;
                 self.mode = Mode::Nav;
+            }
+            Key::Esc => {
+                self.status = SearchStatus::Blank;
+                if self.input.is_empty() {
+                    self.mode = Mode::Nav;
+                } else {
+                    self.input.clear();
+                }
             }
             Key::Backspace => {
                 if !self.input.is_empty() {
                     self.input.truncate(self.input.len() - 1);
+                }
+                if self.input.is_empty() {
+                    self.status = SearchStatus::Blank;
                 }
             }
             Key::Char(c) => {
@@ -142,34 +164,50 @@ impl TUI {
         }
     }
 
+    /// (bg, fg) colors for the prompt
+    fn prompt_colors(&self) -> (&str, &str) {
+        match self.status {
+            SearchStatus::Blank => (color::WhiteBG.as_ref(), color::Black.as_ref()),
+            SearchStatus::Found => (color::GreenBG.as_ref(), color::White.as_ref()),
+            SearchStatus::Missed => (color::RedBG.as_ref(), color::White.as_ref()),
+        }
+    }
+
     /// Draw the ui
     pub fn draw(&self) -> Result<(), io::Error> {
         let (_cols, rows) = terminal_size()?;
         let mut stdout = io::stdout();
 
-        let prompt = if self.mode == Mode::Search {
-            format!(
-                "{}{}{}{}",
-                Goto(1, rows - 2),
+        if self.mode == Mode::Search {
+            let (bg, fg) = self.prompt_colors();
+            write!(
+                stdout,
+                "{}{}{}{}{}{}{}{}{}{}{}{}",
+                ClearAll,
+                Goto(1, rows - 1),
+                bg,
+                fg,
                 ClearLine,
-                color_string!(">> ", Bold, White),
-                self.input
-            )
+                color!(Bold),
+                ">> ",
+                color!(Reset),
+                bg,
+                fg,
+                self.input,
+                color!(Reset),
+            )?;
         } else {
-            "".to_string()
-        };
-
-        write!(
-            stdout,
-            "{}{}{}{}{}{}{}",
-            ClearAll,
-            prompt,
-            Goto(1, rows - 1),
-            color!(MagentaBG),
-            color!(Yellow),
-            ClearLine,
-            color_string!("shy", MagentaBG, Yellow, Bold)
-        )?;
+            write!(
+                stdout,
+                "{}{}{}{}{}{}",
+                ClearAll,
+                Goto(1, rows - 1),
+                color!(MagentaBG),
+                color!(Yellow),
+                ClearLine,
+                color_string!("shy", MagentaBG, Yellow, Bold)
+            )?;
+        }
 
         let mut row = 1;
         for (i, (host, _config)) in self.hosts.iter().enumerate() {
@@ -195,8 +233,12 @@ impl TUI {
         for (i, (host, _)) in self.hosts.iter().enumerate() {
             if host.to_lowercase().starts_with(&self.input.to_lowercase()) {
                 self.selected = i;
+                self.status = SearchStatus::Found;
+                return;
             }
         }
+
+        self.status = SearchStatus::Missed;
     }
 }
 
