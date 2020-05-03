@@ -135,12 +135,7 @@ impl TUI {
     /// Search mode-specific keybindings.
     fn update_input(&mut self, event: Key) {
         match event {
-            Key::Ctrl('c') => {
-                self.input.clear();
-                self.status = SearchStatus::Blank;
-                self.mode = Mode::Nav;
-            }
-            Key::Esc => {
+            Key::Ctrl('c') | Key::Esc => {
                 self.status = SearchStatus::Blank;
                 if self.input.is_empty() {
                     self.mode = Mode::Nav;
