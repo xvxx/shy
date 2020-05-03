@@ -1,5 +1,8 @@
 #[macro_use]
 mod color;
+mod ssh_config;
+
+use ssh_config::{load_ssh_config, HostMap};
 
 use std::{
     io::{self, Stdout, Write},
@@ -16,11 +19,11 @@ use termion::{
 };
 
 fn main() -> Result<(), io::Error> {
+    let hosts = load_ssh_config()?;
     let mut stdout = setup_terminal()?;
     setup_panic_hook();
-    let mut selected = 0;
-    let hosts = vec!["testing.io", "crates.io", "arch-dev"];
 
+    let mut selected = 0;
     update()?;
     draw(&hosts, selected)?;
 
@@ -46,7 +49,12 @@ fn main() -> Result<(), io::Error> {
             }
             Key::Char('\n') => {
                 shutdown_terminal()?;
-                println!("Connecting to {}", hosts[selected]);
+
+                if let Some(host) = hosts.iter().nth(selected) {
+                    println!("$ ssh {}", host.0);
+                } else {
+                    println!("can't find host");
+                }
                 return Ok(());
             }
             _ => {}
@@ -95,18 +103,22 @@ fn update() -> Result<(), io::Error> {
 }
 
 /// Draw the app.
-fn draw(hosts: &[&str], selected: usize) -> Result<(), io::Error> {
+fn draw(hosts: &HostMap, selected: usize) -> Result<(), io::Error> {
+    let (cols, _rows) = terminal_size()?;
     let mut stdout = io::stdout();
     write!(
         stdout,
-        "{}{}{}",
+        "{}{}{}{}{}{}",
         ClearAll,
-        Goto(1, 1),
-        color_string!("shy", Magenta, Bold)
+        Goto(1, cols - 1),
+        color!(MagentaBG),
+        color!(Yellow),
+        ClearLine,
+        color_string!("shy", MagentaBG, Yellow, Bold)
     )?;
 
     let mut row = 3;
-    for (i, host) in hosts.iter().enumerate() {
+    for (i, (host, _config)) in hosts.iter().enumerate() {
         write!(
             stdout,
             "{}{}",
