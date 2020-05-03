@@ -28,7 +28,7 @@ pub struct TUI {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Mode {
     Search,
-    Navigate,
+    Nav,
     Quit,
     Launch(String),
 }
@@ -37,7 +37,7 @@ impl TUI {
     /// Create a new main view and sets up the terminal.
     pub fn new() -> Result<TUI, io::Error> {
         Ok(TUI {
-            mode: Mode::Navigate,
+            mode: Mode::Nav,
             input: String::new(),
             selected: 0,
             hosts: HostMap::new(),
@@ -92,7 +92,7 @@ impl TUI {
 
         match event.unwrap() {
             Key::Char('q') => self.mode = Mode::Quit,
-            Key::Ctrl('c') if self.mode == Mode::Navigate => self.mode = Mode::Quit,
+            Key::Ctrl('c') if self.mode == Mode::Nav => self.mode = Mode::Quit,
             Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
             Key::Up | Key::Ctrl('p') => {
                 if self.selected == 0 {
@@ -127,7 +127,7 @@ impl TUI {
         match event {
             Key::Ctrl('c') | Key::Esc => {
                 self.input.clear();
-                self.mode = Mode::Navigate;
+                self.mode = Mode::Nav;
             }
             Key::Backspace => {
                 if !self.input.is_empty() {
