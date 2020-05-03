@@ -3,7 +3,7 @@ use std::{io, os::unix::process::CommandExt, panic, process::Command};
 
 fn main() -> Result<(), io::Error> {
     if let Some(hostname) = run()? {
-        std::env::set_var("TERM", "xterm");
+        std::env::set_var("TERM", "xterm"); // TODO xterm-kitty hack
         let mut cmd = Command::new("ssh");
         let cmd = cmd.arg(hostname);
         let err = cmd.exec();

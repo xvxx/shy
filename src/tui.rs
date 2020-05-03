@@ -136,6 +136,7 @@ impl TUI {
                 }
                 Key::Char(c) => {
                     self.input.push(c);
+                    self.search_for_host();
                 }
                 _ => {}
             },
@@ -191,6 +192,15 @@ impl TUI {
 
         stdout.flush()?;
         Ok(())
+    }
+
+    /// Checks the current self.input against hostnames to find a match.
+    fn search_for_host(&mut self) {
+        for (i, (host, _)) in self.hosts.iter().enumerate() {
+            if host.to_lowercase().starts_with(&self.input.to_lowercase()) {
+                self.selected = i;
+            }
+        }
     }
 }
 
