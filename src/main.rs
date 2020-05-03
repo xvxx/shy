@@ -1,4 +1,6 @@
-// use flume::{unbounded, Receiver, Selector};
+#[macro_use]
+mod color;
+
 use std::{
     io::{self, Stdout, Write},
     panic,
