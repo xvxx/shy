@@ -15,7 +15,6 @@ fn main() -> Result<(), io::Error> {
 
 fn run() -> Result<Option<String>, io::Error> {
     setup_panic_hook();
-
     let mut app = App::new()?;
     Ok(app.run()?)
 }
