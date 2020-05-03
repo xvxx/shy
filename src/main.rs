@@ -6,7 +6,9 @@ use ssh_config::{load_ssh_config, HostMap};
 
 use std::{
     io::{self, Stdout, Write},
+    os::unix::process::CommandExt,
     panic,
+    process::Command,
 };
 use termion::{
     clear::{All as ClearAll, CurrentLine as ClearLine},
@@ -19,6 +21,18 @@ use termion::{
 };
 
 fn main() -> Result<(), io::Error> {
+    if let Some(hostname) = run()? {
+        std::env::set_var("TERM", "xterm");
+        let mut cmd = Command::new("ssh");
+        let cmd = cmd.arg(hostname);
+        let err = cmd.exec();
+        eprintln!("{:?}", err);
+    }
+
+    Ok(())
+}
+
+fn run() -> Result<Option<String>, io::Error> {
     let hosts = load_ssh_config()?;
     let mut stdout = setup_terminal()?;
     setup_panic_hook();
@@ -48,14 +62,12 @@ fn main() -> Result<(), io::Error> {
                 }
             }
             Key::Char('\n') => {
-                shutdown_terminal()?;
-
                 if let Some(host) = hosts.iter().nth(selected) {
-                    println!("$ ssh {}", host.0);
+                    shutdown_terminal()?;
+                    return Ok(Some(host.0.clone()));
                 } else {
-                    println!("can't find host");
+                    panic!("can't find host");
                 }
-                return Ok(());
             }
             _ => {}
         }
@@ -64,7 +76,7 @@ fn main() -> Result<(), io::Error> {
     }
 
     shutdown_terminal()?;
-    Ok(())
+    Ok(None)
 }
 
 /// Switch to alternate mode, set colors, hide cursor.

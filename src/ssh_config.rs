@@ -11,6 +11,7 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
     let mut line = vec![];
     let mut skip_line = false;
     let mut stanza = String::new();
+    let mut key = true; // parsing the key or the value?
 
     for c in config.chars() {
         if skip_line {
@@ -25,16 +26,18 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
             skip_line = true;
             line.push(token);
             token = String::new();
-        } else if c == ' ' || c == '=' {
+        } else if key && (c == ' ' || c == '=') {
             // "key = value" OR "key value" separator
             if !token.is_empty() {
                 line.push(token);
                 token = String::new();
+                key = false;
             }
         } else if c == '\n' {
             if !token.is_empty() {
                 line.push(token);
                 token = String::new();
+                key = true;
             }
 
             // newline
@@ -55,7 +58,11 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
                                 format!("can't parse line: {:?}", line),
                             ));
                         }
-                        map.insert(stanza.clone(), line[1].clone());
+                        // skip catch-all
+                        if stanza != "*" {
+                            map.insert(stanza.clone(), line[1].clone());
+                        }
+                        stanza.clear();
                     }
                     _ => {}
                 }
