@@ -1,63 +1,80 @@
-use flume::{unbounded, Receiver};
+// use flume::{unbounded, Receiver, Selector};
 use std::{
-    io::{self, Write},
-    thread,
+    io::{self, Stdout, Write},
+    panic,
 };
 use termion::{
+    clear::{All as ClearAll, CurrentLine as ClearLine},
     cursor::{Goto, Hide as HideCursor, Show as ShowCursor},
     event::Key,
     input::TermRead,
-    raw::IntoRawMode,
+    raw::{IntoRawMode, RawTerminal},
     screen::{ToAlternateScreen, ToMainScreen},
     terminal_size,
 };
 
 fn main() -> Result<(), io::Error> {
-    setup_terminal()?;
-    let (cols, rows) = terminal_size()?;
+    better_panic::install();
+    setup_panic_hook();
 
-    println!("hi mom");
-    write!(stdout, "{}", Goto(1, 3))?;
-    println!("term is {}x{}", cols, rows);
-    std::thread::sleep(std::time::Duration::from_secs(4));
+    let mut stdout = setup_terminal()?;
 
-    write!(stdout, "{}", ShowCursor)?;
-    write!(stdout, "{}", ToMainScreen)?;
+    update()?;
+    draw()?;
+
+    while let Some(Ok(event)) = io::stdin().keys().next() {
+        write!(stdout, "{}{}event: {:?}", Goto(1, 7), ClearLine, event)?;
+        stdout.flush()?;
+
+        if event == Key::Char('q') || event == Key::Ctrl('c') {
+            break;
+        }
+    }
+
+    shutdown_terminal()?;
     Ok(())
 }
 
-fn setup_terminal() -> Result<(), io::Error> {
+/// Switch to alternate mode, set colors, hide cursor.
+fn setup_terminal() -> Result<RawTerminal<Stdout>, io::Error> {
     let mut stdout = io::stdout().into_raw_mode()?;
     write!(stdout, "{}", ToAlternateScreen)?;
     write!(stdout, "{}", HideCursor)?;
+    write!(stdout, "{}", ClearAll)?;
     write!(stdout, "{}", Goto(1, 1))?;
-    Ok(())
+    stdout.flush()?;
+    Ok(stdout)
 }
 
+/// Restore terminal state to pre-launch.
 fn shutdown_terminal() -> Result<(), io::Error> {
     let mut stdout = io::stdout();
     write!(stdout, "{}", ShowCursor)?;
     write!(stdout, "{}", ToMainScreen)?;
+    stdout.flush()?;
     Ok(())
 }
 
-fn setup_ui_events() -> Receiver<Key> {
-    let (sender, receiver) = unbounded();
-    thread::spawn(move || loop {
-        sender
-            .send(io::stdin().keys().next().unwrap().unwrap())
-            .unwrap();
-    });
-
-    receiver
+/// We need to cleanup the terminal before exiting, even on panic!
+fn setup_panic_hook() {
+    panic::set_hook(Box::new(|panic_info| {
+        let _ = shutdown_terminal();
+        better_panic::Settings::auto().create_panic_handler()(panic_info);
+    }));
 }
 
-fn setup_ctrl_c() -> Receiver<()> {
-    let (sender, receiver) = unbounded();
-    ctrlc::set_handler(move || {
-        sender.send(()).unwrap();
-    })
-    .unwrap();
+/// Update our state in response to key presses.
+fn update() -> Result<(), io::Error> {
+    Ok(())
+}
 
-    receiver
+/// Draw the app.
+fn draw() -> Result<(), io::Error> {
+    let (cols, rows) = terminal_size()?;
+    let mut stdout = io::stdout();
+    write!(stdout, "hi mom")?;
+    write!(stdout, "{}", Goto(1, 3))?;
+    write!(stdout, "term is {}x{}", cols, rows)?;
+    stdout.flush()?;
+    Ok(())
 }
