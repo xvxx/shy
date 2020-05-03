@@ -12,6 +12,7 @@ fn main() -> Result<(), io::Error> {
         match arg.as_ref() {
             "-h" | "-help" | "--help" => return print_usage(),
             "-v" | "-version" | "--version" => return print_version(),
+            "-c" | "-config" | "--config" => todo!(),
             _ => {}
         }
     }
