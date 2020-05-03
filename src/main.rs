@@ -20,17 +20,36 @@ fn main() -> Result<(), io::Error> {
     setup_panic_hook();
 
     let mut stdout = setup_terminal()?;
+    let mut selected = 0;
+    let hosts = vec!["testing.io", "crates.io", "arch-dev"];
 
     update()?;
-    draw()?;
+    draw(&hosts, selected)?;
 
     while let Some(Ok(event)) = io::stdin().keys().next() {
         write!(stdout, "{}{}event: {:?}", Goto(1, 7), ClearLine, event)?;
         stdout.flush()?;
 
-        if event == Key::Char('q') || event == Key::Ctrl('c') {
-            break;
+        match event {
+            Key::Char('q') | Key::Ctrl('c') => break,
+            Key::Up | Key::Ctrl('p') => {
+                if selected == 0 {
+                    selected = hosts.len() - 1;
+                } else {
+                    selected -= 1;
+                }
+            }
+            Key::Down | Key::Ctrl('n') => {
+                if selected >= hosts.len() - 1 {
+                    selected = 0;
+                } else {
+                    selected += 1;
+                }
+            }
+            _ => {}
         }
+
+        draw(&hosts, selected)?;
     }
 
     shutdown_terminal()?;
@@ -71,12 +90,31 @@ fn update() -> Result<(), io::Error> {
 }
 
 /// Draw the app.
-fn draw() -> Result<(), io::Error> {
-    let (cols, rows) = terminal_size()?;
+fn draw(hosts: &[&str], selected: usize) -> Result<(), io::Error> {
     let mut stdout = io::stdout();
-    write!(stdout, "hi mom")?;
-    write!(stdout, "{}", Goto(1, 3))?;
-    write!(stdout, "term is {}x{}", cols, rows)?;
+    write!(
+        stdout,
+        "{}{}{}",
+        ClearAll,
+        Goto(1, 1),
+        color_string!("shy", Magenta, Bold)
+    )?;
+
+    let mut row = 3;
+    for (i, host) in hosts.iter().enumerate() {
+        write!(
+            stdout,
+            "{}{}",
+            Goto(1, row),
+            if i == selected {
+                format!("> {}", color_string!(host, Yellow, Bold))
+            } else {
+                format!("  {}", color_string!(host, White))
+            }
+        )?;
+        row += 1;
+    }
+
     stdout.flush()?;
     Ok(())
 }
