@@ -23,12 +23,9 @@ allowing you to quickly select one using a readline-ish prompt.
 
 ### Fancy
 
-- [ ] man page
 - [ ] screenshot for README
 - [ ] screencast for README
 - [ ] publish as crate
 - [ ] usage in README
-- [ ] -h
-- [ ] -v
 - [ ] installation in README
 - [ ] tests

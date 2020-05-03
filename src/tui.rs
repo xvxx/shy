@@ -122,7 +122,7 @@ impl TUI {
             }
             event if self.mode == Mode::Nav => match event {
                 Key::Char('q') => self.mode = Mode::Quit,
-                Key::Char('i') | Key::Char('s') => self.mode = Mode::Search,
+                Key::Char('i') | Key::Char('s') | Key::Char('/') | Key::Char('f') => self.mode = Mode::Search,
                 _ => {}
             },
             event if self.mode == Mode::Search => self.update_input(event),

@@ -43,8 +43,9 @@ _shy_ has two modes: Navigation mode and Search mode. By default, the
 program is in Navigation mode - a simple list view that lets you move
 your selected host up or down.
 
-By pressing `i` or `s` the program enters Search mode, allowing you to
-quickly jump to a host by typing the beginning of its name.
+By pressing `i`, `s`, `f`, or `/`, the program enters Search mode,
+allowing you to quickly jump to a host by typing the beginning of its
+name.
 
 ## NAV MODE KEYBOARD SHORTCUTS
 
@@ -67,9 +68,9 @@ _i_, _s_, _/_, _f_
 _Esc_, _Ctrl-c_
 	Clear the input, and then exit Search mode.
 
-_up arrow_, _Ctrl-p_, _k_
+_Up arrow_, _Ctrl-p_, _k_
 	Select previous matching host.
-_down arrow_, _Ctrl-n_, _j_
+_Down arrow_, _Ctrl-n_, _j_
 	Select next matching host.
 
 _Enter_
