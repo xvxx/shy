@@ -16,10 +16,8 @@ use termion::{
 };
 
 fn main() -> Result<(), io::Error> {
-    better_panic::install();
-    setup_panic_hook();
-
     let mut stdout = setup_terminal()?;
+    setup_panic_hook();
     let mut selected = 0;
     let hosts = vec!["testing.io", "crates.io", "arch-dev"];
 
@@ -46,6 +44,11 @@ fn main() -> Result<(), io::Error> {
                     selected += 1;
                 }
             }
+            Key::Char('\n') => {
+                shutdown_terminal()?;
+                println!("Connecting to {}", hosts[selected]);
+                return Ok(());
+            }
             _ => {}
         }
 
@@ -69,6 +72,8 @@ fn setup_terminal() -> Result<RawTerminal<Stdout>, io::Error> {
 
 /// Restore terminal state to pre-launch.
 fn shutdown_terminal() -> Result<(), io::Error> {
+    let stdout = io::stdout();
+    stdout.into_raw_mode()?.suspend_raw_mode()?;
     let mut stdout = io::stdout();
     write!(stdout, "{}", ShowCursor)?;
     write!(stdout, "{}", ToMainScreen)?;
@@ -80,7 +85,7 @@ fn shutdown_terminal() -> Result<(), io::Error> {
 fn setup_panic_hook() {
     panic::set_hook(Box::new(|panic_info| {
         let _ = shutdown_terminal();
-        better_panic::Settings::auto().create_panic_handler()(panic_info);
+        println!("{}", panic_info);
     }));
 }
 
