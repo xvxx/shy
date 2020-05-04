@@ -17,6 +17,11 @@ file, you can now run:
 
     shy
 
+To connect more quickly to a host, you may want to launch in search
+mode:
+
+    shy -s
+
 ## keyboard shortcuts
 
 | **Shortcut**        | **Nav Mode**        | **Search Mode**                    |

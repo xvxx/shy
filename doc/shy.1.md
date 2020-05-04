@@ -19,7 +19,12 @@ Usually _shy_ is started with no options:
 
 	shy
 
-If you want to use a config file other than `~/.ssh/config`, however,
+To connect more quickly to a host, you may want to launch in search
+mode:
+
+	shy -s
+
+If you want to use a config file other than `~/.ssh/config`,
 you can pass a path using the `-c` or `--config` options.
 
 # OPTIONS

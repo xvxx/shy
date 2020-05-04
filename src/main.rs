@@ -3,6 +3,7 @@ use std::{io, os::unix::process::CommandExt, panic, process::Command};
 
 fn main() -> Result<(), io::Error> {
     let mut config_path = "~/.ssh/config";
+    let mut search_mode = false;
 
     let args = parse_args()?;
     let mut args = args.iter();
@@ -10,6 +11,7 @@ fn main() -> Result<(), io::Error> {
         match arg.as_ref() {
             "-h" | "-help" | "--help" => return print_usage(),
             "-v" | "-version" | "--version" => return print_version(),
+            "-s" | "-search" | "--search" => search_mode = true,
             "-c" | "-config" | "--config" | "-F" => {
                 if let Some(path) = args.next() {
                     config_path = path;
@@ -24,7 +26,7 @@ fn main() -> Result<(), io::Error> {
         }
     }
 
-    if let Some(hostname) = run(config_path)? {
+    if let Some(hostname) = run(config_path, search_mode)? {
         std::env::set_var("TERM", "xterm"); // TODO xterm-kitty hack
         let mut cmd = Command::new("ssh");
         let cmd = cmd.arg(hostname);
@@ -36,9 +38,12 @@ fn main() -> Result<(), io::Error> {
 }
 
 /// Run the app, optionally returning a host to SSH to.
-fn run(config_path: &str) -> Result<Option<String>, io::Error> {
+fn run(config_path: &str, search_mode: bool) -> Result<Option<String>, io::Error> {
     setup_panic_hook();
     let mut app = App::new(config_path)?;
+    if search_mode {
+        app.mode = shy::tui::Mode::Search;
+    }
     Ok(app.run()?)
 }
 
@@ -71,6 +76,7 @@ fn print_usage() -> Result<(), io::Error> {
 
 Options:
     -c, --config FILE    Use FILE instead of ~/.ssh/config
+    -s, --search         Start in Search mode.
     -v, --version        Print shy version and exit.
     -h, --help           Show this message."
     );

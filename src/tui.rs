@@ -19,7 +19,7 @@ use termion::{
 
 /// App state.
 pub struct TUI {
-    mode: Mode,
+    pub mode: Mode,
     status: SearchStatus,
     input: String,
     selected: usize,
