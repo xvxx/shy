@@ -1,6 +1,6 @@
 [package]
 name = "shy"
-version = "0.1.2-alpha.0"
+version = "0.1.2-dev"
 authors = ["chris west <c@xvxx.io>"]
 description = "barebones ssh launcher"
 repository = "https://github.com/xvxx/shy"
@@ -12,6 +12,14 @@ categories = ["command-line-utilities"]
 exclude = [
     "img/*"
 ]
+
+# Change v1.4.1 -> v1.4.2 in README on `cargo release`
+[package.metadata.release]
+pre-release-replacements = [
+  {file="README.md", search="shy-v\\d+\\.\\d+\\.\\d+-", replace="{{crate_name}}-v{{version}}-"},
+  {file="README.md", search="/v\\d+\\.\\d+\\.\\d+/", replace="/v{{version}}/"},
+]
+dev-version-ext = "dev"
 
 [dependencies]
 termion = "1.5.5"
