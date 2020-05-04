@@ -72,7 +72,7 @@ fn parse_args() -> Result<Vec<String>, io::Error> {
 /// --help
 fn print_usage() -> Result<(), io::Error> {
     println!(
-        "usage: shy [options]
+        "Usage: shy [options]
 
 Options:
     -c, --config FILE    Use FILE instead of ~/.ssh/config
