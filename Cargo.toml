@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["chris west <c@xvxx.io>"]
 description = "barebones ssh launcher"
 repository = "https://github.com/xvxx/shy"
+readme = "README.md"
 edition = "2018"
 license = "MIT"
 keywords = ["ssh", "tui", "terminal", "cli"]
