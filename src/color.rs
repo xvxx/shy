@@ -69,6 +69,8 @@ macro_rules! define_color {
 }
 
 define_color!(Reset, 0);
+define_color!(ResetFG, 39);
+define_color!(ResetBG, 49);
 define_color!(Bold, 1);
 define_color!(Underline, 4);
 
