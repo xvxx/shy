@@ -14,7 +14,10 @@ fn main() -> Result<(), io::Error> {
                 if let Some(path) = args.next() {
                     config_path = path;
                 } else {
-                    return Err(io::Error::new(io::ErrorKind::Other, "Please provide a config path."));
+                    return Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        "Please provide a config path.",
+                    ));
                 }
             }
             _ => {}
@@ -67,7 +70,7 @@ fn print_usage() -> Result<(), io::Error> {
         "usage: shy [options]
 
 Options:
-    -c, --config FILE    Use config file of ~/.ssh/config
+    -c, --config FILE    Use FILE instead of ~/.ssh/config
     -v, --version        Print shy version and exit.
     -h, --help           Show this message."
     );
