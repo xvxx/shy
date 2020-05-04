@@ -2,6 +2,11 @@ use std::{collections::BTreeMap, fs, io};
 
 pub type HostMap = BTreeMap<String, String>;
 
+/// For now just load the hostnames and their labels.
+pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
+    parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
+}
+
 /// Parse .ssh/config to a (sorted) BTree.
 pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> {
     let config = config.as_ref();
@@ -77,7 +82,34 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
     Ok(map)
 }
 
-/// For now just load the hostnames and their labels.
-pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
-    parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config() {
+        let config = load_ssh_config("./tests/test_config").expect("failed to parse config");
+        assert_eq!(11, config.len());
+
+        assert_eq!(
+            config.keys().cloned().collect::<Vec<_>>(),
+            vec![
+                "homework-server",
+                "nixcraft",
+                "docker1",
+                "nas01",
+                "docker2",
+                "docker3",
+                "devserver",
+                "ec2-some-long-name.amazon.probably.com",
+                "ec2-some-long-namer.amazon.probably.com",
+                "torrentz-server",
+                "midi-files.com"
+            ]
+        );
+        assert_eq!("torrentz-r-us.com", config.get("torrentz-server").unwrap());
+        assert_eq!("docker3", config.get("docker3").unwrap());
+        assert_eq!("nas01", config.get("192.168.1.100").unwrap());
+        assert_eq!("midi-files.com", config.get("midi-files.com").unwrap());
+    }
 }
