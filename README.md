@@ -4,6 +4,17 @@
 parses your `~/.ssh/config` file and displays all your "Host" patterns,
 allowing you to quickly select one using a readline-ish prompt.
 
+## Install
+
+If you have [cargo] installed, installation is a breeze:
+
+    cargo install shy
+
+Assuming you have `~/.cargo/bin` in your `$PATH` and a `~/.ssh/config`
+file, you can now run:
+
+    shy
+
 ## Keyboard Shortcuts
 
 | **Shortcut**       | **Nav Mode**        | **Search Mode**                    |
@@ -29,3 +40,5 @@ allowing you to quickly select one using a readline-ish prompt.
 - [ ] usage in README
 - [ ] installation in README
 - [ ] tests
+
+[cargo]: https://rustup.rs/
