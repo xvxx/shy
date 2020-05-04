@@ -39,6 +39,7 @@ pub enum Mode {
 }
 
 /// Was the input search successful?
+#[derive(PartialEq)]
 pub enum SearchStatus {
     Blank,
     Found,
@@ -161,7 +162,9 @@ impl TUI {
             Key::Up | Key::Ctrl('p') => self.select_prev(),
             Key::Down | Key::Ctrl('n') => self.select_next(),
             Key::Char('\n') => {
-                if let Some(host) = self.hosts.iter().nth(self.selected) {
+                if self.mode == Mode::Search && self.status == SearchStatus::Missed {
+                    // do nothing on a search that doesn't match
+                } else if let Some(host) = self.hosts.iter().nth(self.selected) {
                     self.mode = Mode::Launch(host.0.clone());
                 } else {
                     return Err(io::Error::new(io::ErrorKind::Other, "can't find host"));
