@@ -317,6 +317,20 @@ impl TUI {
         host.to_lowercase().starts_with(&search.to_lowercase())
     }
 
+    /// The name of the currently selected host pattern.
+    fn selected_name(&self) -> &str {
+        if let Some((_, (name, _))) = self
+            .hosts
+            .iter()
+            .enumerate()
+            .find(|(i, _)| *i == self.selected)
+        {
+            name
+        } else {
+            "shy"
+        }
+    }
+
     /// The hostname of the currently selected host pattern. The two
     /// might be different.
     fn selected_hostname(&self) -> &str {
@@ -348,9 +362,15 @@ impl TUI {
 
         if self.mode == Mode::Search {
             let (bg, fg) = self.prompt_colors();
+            let hint = if self.status == SearchStatus::Found {
+                &self.selected_name()[self.input.len()..]
+            } else {
+                ""
+            };
+
             write!(
                 stdout,
-                "{}{}{}{}{}{}{}{}{}{}{}{}",
+                "{}{}{}{}{}{}{}{}{}{}{}{}{}",
                 ClearAll,
                 Goto(1, rows),
                 bg,
@@ -358,10 +378,11 @@ impl TUI {
                 ClearLine,
                 color!(Bold),
                 ">> ",
+                self.input,
                 color!(Reset),
                 bg,
                 fg,
-                self.input,
+                hint,
                 color!(Reset),
             )?;
         } else {
