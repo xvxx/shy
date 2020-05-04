@@ -52,10 +52,14 @@ name.
 _q_, _Esc_, _Ctrl-c_
 	Quit _shy_.
 
-_up arrow_, _Ctrl-p_, _k_
+_Up arrow_, _Ctrl-p_, _k_
 	Select previous host in list.
-_down arrow_, _Ctrl-n_, _j_
+_Down arrow_, _Ctrl-n_, _j_
 	Select next host in list.
+_Page Down_, _Spacebar_
+	Jump down by 5 entries
+_Page Up_, _-_
+	Jump up by 5 entries
 
 _Enter_
 	Connect to selected host.

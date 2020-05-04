@@ -23,5 +23,5 @@ doc/shy.1: doc/shy.1.md scdoc
 
 # Must have scdoc installed to build manual.
 scdoc:
-	@which zcdoc || (echo "scdoc(1) not found."; \
+	@which scdoc || (echo "scdoc(1) not found."; \
 		echo "please install to build the manpage: https://repology.org/project/scdoc"; exit 1)

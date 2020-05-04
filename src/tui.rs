@@ -98,6 +98,19 @@ impl TUI {
 
         match event.unwrap() {
             Key::Ctrl('c') | Key::Esc if self.mode == Mode::Nav => self.mode = Mode::Quit,
+            Key::Char(' ') | Key::PageDown => {
+                self.selected += 5;
+                if self.selected > self.hosts.len() - 1 {
+                    self.selected = self.hosts.len() - 1;
+                }
+            }
+            Key::Char('-') | Key::PageUp => {
+                if self.selected > 5 {
+                    self.selected -= 5;
+                } else {
+                    self.selected = 0;
+                }
+            }
             Key::Up | Key::Ctrl('p') => self.select_prev(),
             Key::Down | Key::Ctrl('n') => self.select_next(),
             Key::Char('\n') => {

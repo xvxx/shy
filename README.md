@@ -17,20 +17,21 @@ file, you can now run:
 
 ## Keyboard Shortcuts
 
-| **Shortcut**       | **Nav Mode**        | **Search Mode**                    |
-| ------------------ | ------------------- | ---------------------------------- |
-| `i`, `s`, `f`, `/` | Enter search mode   |                                    |
-| `r`                | Refresh             |                                    |
-| `ctrl-c`, `ESC`    | Quit                | Clear Input, then Exit Search Mode |
-| `up`, `ctrl-p`     | Move selection up   | Jump to previous match             |
-| `down`, `ctrl-n`   | Move selection down | Jump to next match                 |
-
+| **Shortcut**        | **Nav Mode**        | **Search Mode**                    |
+| ------------------- | ------------------- | ---------------------------------- |
+| `i`, `s`, `f`, `/`  | Enter search mode   |                                    |
+| `up`, `ctrl-p`      | Move selection up   | Jump to previous match             |
+| `down`, `ctrl-n`    | Move selection down | Jump to next match                 |
+| `PageDown`, `space` | Jump down 5 entries |                                    |
+| `PageUp`, `-`       | Jump up 5 entries   |                                    |
+| `r`                 | Refresh             |                                    |
+| `ctrl-c`, `ESC`     | Quit                | Clear Input, then Exit Search Mode |
 
 ## Screenies
 
-| Nav | Search |
-| --- | --- |
-| <img src="./img/screen1.jpeg"> |<img src="./img/screen2.jpeg">  |
+| Nav                            | Search                         |
+| ------------------------------ | ------------------------------ |
+| <img src="./img/screen1.jpeg"> | <img src="./img/screen2.jpeg"> |
 
 ## TODO
 
