@@ -41,13 +41,13 @@ pub enum SearchStatus {
 
 impl TUI {
     /// Create a new main view and sets up the terminal.
-    pub fn new() -> Result<TUI, io::Error> {
+    pub fn new(config_path: &str) -> Result<TUI, io::Error> {
         Ok(TUI {
             mode: Mode::Nav,
             status: SearchStatus::Blank,
             input: String::new(),
             selected: 0,
-            hosts: HostMap::new(),
+            hosts: load_ssh_config(config_path)?,
             stdout: Self::setup_terminal()?,
         })
     }
@@ -75,7 +75,6 @@ impl TUI {
 
     /// Main loop. Returns the host we want to SSH to, if any.
     pub fn run(&mut self) -> Result<Option<String>, io::Error> {
-        self.hosts = load_ssh_config()?;
         self.update(None)?;
         self.draw()?;
 

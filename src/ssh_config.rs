@@ -78,7 +78,6 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
 }
 
 /// For now just load the hostnames and their labels.
-pub fn load_ssh_config() -> Result<HostMap, io::Error> {
-    let path = format!("{}/.ssh/config", env!("HOME"));
-    parse_ssh_config(&fs::read_to_string(path)?)
+pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
+    parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
 }

@@ -27,7 +27,7 @@ fn main() -> Result<(), io::Error> {
 /// Run the app, optionally returning a host to SSH to.
 fn run() -> Result<Option<String>, io::Error> {
     setup_panic_hook();
-    let mut app = App::new()?;
+    let mut app = App::new("~/.ssh/config")?;
     Ok(app.run()?)
 }
 
