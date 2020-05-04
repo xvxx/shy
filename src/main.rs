@@ -2,18 +2,26 @@ use shy::App;
 use std::{io, os::unix::process::CommandExt, panic, process::Command};
 
 fn main() -> Result<(), io::Error> {
-    let args = parse_args()?;
+    let mut config_path = "~/.ssh/config";
 
-    for arg in args {
+    let args = parse_args()?;
+    let mut args = args.iter();
+    while let Some(arg) = args.next() {
         match arg.as_ref() {
             "-h" | "-help" | "--help" => return print_usage(),
             "-v" | "-version" | "--version" => return print_version(),
-            "-c" | "-config" | "--config" => todo!(),
+            "-c" | "-config" | "--config" | "-F" => {
+                if let Some(path) = args.next() {
+                    config_path = path;
+                } else {
+                    return Err(io::Error::new(io::ErrorKind::Other, "Please provide a config path."));
+                }
+            }
             _ => {}
         }
     }
 
-    if let Some(hostname) = run()? {
+    if let Some(hostname) = run(config_path)? {
         std::env::set_var("TERM", "xterm"); // TODO xterm-kitty hack
         let mut cmd = Command::new("ssh");
         let cmd = cmd.arg(hostname);
@@ -25,9 +33,9 @@ fn main() -> Result<(), io::Error> {
 }
 
 /// Run the app, optionally returning a host to SSH to.
-fn run() -> Result<Option<String>, io::Error> {
+fn run(config_path: &str) -> Result<Option<String>, io::Error> {
     setup_panic_hook();
-    let mut app = App::new("~/.ssh/config")?;
+    let mut app = App::new(config_path)?;
     Ok(app.run()?)
 }
 
