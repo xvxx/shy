@@ -12,10 +12,10 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
     let config = config.as_ref();
     let mut map = BTreeMap::new();
 
-    let mut token = String::new();
-    let mut line = vec![];
-    let mut skip_line = false;
-    let mut stanza = String::new();
+    let mut token = String::new(); // the token we're parsing
+    let mut line = vec![]; // current line
+    let mut skip_line = false; // skip until EOL for comments
+    let mut stanza = String::new(); // ssh config is broken into stanzas
     let mut key = true; // parsing the key or the value?
 
     for c in config.chars() {
@@ -27,10 +27,12 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
         }
 
         if c == '#' {
-            // comment
+            // skip comments
             skip_line = true;
-            line.push(token);
-            token = String::new();
+            if !token.is_empty() {
+                line.push(token);
+                token = String::new();
+            }
         } else if key && (c == ' ' || c == '=') {
             // "key = value" OR "key value" separator
             if !token.is_empty() {
@@ -45,7 +47,6 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
                 key = true;
             }
 
-            // newline
             if line.is_empty() {
                 continue;
             } else if line.len() != 2 {
@@ -54,25 +55,36 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
                     format!("can't parse line: {:?}", line),
                 ));
             } else {
-                match line[0].as_ref() {
-                    "Host" => stanza = line[1].clone(),
-                    "Hostname" => {
-                        if stanza.is_empty() {
-                            return Err(io::Error::new(
-                                io::ErrorKind::Other,
-                                format!("can't parse line: {:?}", line),
-                            ));
+                match line[0].to_lowercase().as_ref() {
+                    "host" => {
+                        let parsed = &line[1];
+                        // skip any Host patterns
+                        if parsed.contains('*')
+                            || parsed.contains('!')
+                            || parsed.contains(',')
+                            || parsed.contains(' ')
+                        {
+                            stanza.clear();
+                        } else {
+                            stanza = parsed.clone();
+                            // by default we assume host patterns are
+                            // actual hostnames
+                            map.insert(stanza.clone(), stanza.clone());
                         }
-                        // skip catch-all
-                        if stanza != "*" {
+                    }
+                    "hostname" => {
+                        if !stanza.is_empty() {
                             map.insert(stanza.clone(), line[1].clone());
+                            stanza.clear();
                         }
-                        stanza.clear();
                     }
                     _ => {}
                 }
                 line.clear();
             }
+        } else if (c == ' ' || c == '=') && token.is_empty() {
+            // skip = and whitespace at start of value, key = value format
+            continue;
         } else {
             // regular char
             token.push(c);
@@ -94,22 +106,22 @@ mod tests {
         assert_eq!(
             config.keys().cloned().collect::<Vec<_>>(),
             vec![
-                "homework-server",
-                "nixcraft",
+                "devserver",
                 "docker1",
-                "nas01",
                 "docker2",
                 "docker3",
-                "devserver",
                 "ec2-some-long-name.amazon.probably.com",
                 "ec2-some-long-namer.amazon.probably.com",
+                "homework-server",
+                "midi-files.com",
+                "nas01",
+                "nixcraft",
                 "torrentz-server",
-                "midi-files.com"
             ]
         );
         assert_eq!("torrentz-r-us.com", config.get("torrentz-server").unwrap());
         assert_eq!("docker3", config.get("docker3").unwrap());
-        assert_eq!("nas01", config.get("192.168.1.100").unwrap());
+        assert_eq!("192.168.1.100", config.get("nas01").unwrap());
         assert_eq!("midi-files.com", config.get("midi-files.com").unwrap());
     }
 }
