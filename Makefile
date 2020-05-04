@@ -10,6 +10,10 @@ run:
 build: src/*.rs
 	cargo build --release
 
+.PHONY: test
+test: src/*.rs
+	cargo test
+
 .PHONY: clean
 clean:
 	@rm -rf target

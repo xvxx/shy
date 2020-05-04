@@ -120,7 +120,7 @@ mod tests {
             ]
         );
         assert_eq!("torrentz-r-us.com", config.get("torrentz-server").unwrap());
-        assert_eq!("docker3", config.get("docker3").unwrap());
+        assert_eq!("docker3.mycloud.net", config.get("docker3").unwrap());
         assert_eq!("192.168.1.100", config.get("nas01").unwrap());
         assert_eq!("midi-files.com", config.get("midi-files.com").unwrap());
     }
