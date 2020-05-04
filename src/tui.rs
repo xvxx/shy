@@ -254,7 +254,7 @@ impl TUI {
     fn prompt_colors(&self) -> (&str, &str) {
         match self.status {
             SearchStatus::Blank => (color::WhiteBG.as_ref(), color::Black.as_ref()),
-            SearchStatus::Found => (color::GreenBG.as_ref(), color::White.as_ref()),
+            SearchStatus::Found => (color::GreenBG.as_ref(), color::Black.as_ref()),
             SearchStatus::Missed => (color::RedBG.as_ref(), color::White.as_ref()),
         }
     }

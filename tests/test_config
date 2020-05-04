@@ -11,20 +11,20 @@ Host nixcraft
     Port 4242
     IdentityFile /nfs/shared/users/nixcraft/keys/server1/id_rsa
 Host docker1
-    Hostname docker1
+    Hostname docker1.mycloud.net
 # another comment
 Host nas01
      HostName 192.168.1.100
      User root
      IdentityFile ~/.ssh/nas01.key
 Host docker2
-    Hostname docker2
+    Hostname docker2.mycloud.net
 Host docker3
-    Hostname docker3
+    Hostname docker3.mycloud.net
 Host docker*
     IdentityFile ~/.ssh/docker.key
 Host devserver
-    Hostname devserver
+    Hostname devserver.io
 Host ec2-some-long-name.amazon.probably.com
     Hostname ec2-1
     User ec2-user

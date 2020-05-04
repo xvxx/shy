@@ -4,7 +4,7 @@
 parses your `~/.ssh/config` file and displays all your "Host" patterns,
 allowing you to quickly select one using a readline-ish prompt.
 
-## Install
+## install
 
 If you have [cargo] installed, installation is a breeze:
 
@@ -15,7 +15,7 @@ file, you can now run:
 
     shy
 
-## Keyboard Shortcuts
+## keyboard shortcuts
 
 | **Shortcut**        | **Nav Mode**        | **Search Mode**                    |
 | ------------------- | ------------------- | ---------------------------------- |
@@ -27,17 +27,14 @@ file, you can now run:
 | `r`                 | Refresh             |                                    |
 | `ctrl-c`, `ESC`     | Quit                | Clear Input, then Exit Search Mode |
 
-## Screenies
+## screenies
 
-| Nav                            | Search                         |
-| ------------------------------ | ------------------------------ |
-| <img src="./img/screen1.jpeg"> | <img src="./img/screen2.jpeg"> |
+| ![Screenshot](./img/screen1.jpeg) | ![Screenshot](./img/screen2.jpeg) |
+| :-------------------------------: | :-------------------------------: |
+|                Nav                |            Search.com             |
 
 ## TODO
 
-- [ ] correctly parse .ssh/config
-- [ ] config parsing
-- [ ] show actual hostnames in status bar
 - [ ] screencast for README
 
 [cargo]: https://rustup.rs/
