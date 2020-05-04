@@ -37,8 +37,8 @@ mode:
 ## screenies
 
 | ![Screenshot](./img/screen1.jpeg) | ![Screenshot](./img/screen2.jpeg) |
-| :-------------------------------: | :-------------------------------: |
-|                nav                |              search               |
+| --------------------------------- | --------------------------------- |
+| ![Screenshot](./img/screen3.jpeg) | ![Screenshot](./img/screen4.jpeg) |
 
 ## TODO
 
