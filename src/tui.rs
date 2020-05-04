@@ -2,7 +2,11 @@ use crate::{
     color,
     ssh_config::{load_ssh_config, HostMap},
 };
-use std::io::{self, Stdout, Write};
+use flume::{unbounded, Receiver, Selector};
+use std::{
+    io::{self, Stdout, Write},
+    thread,
+};
 use termion::{
     clear::{All as ClearAll, CurrentLine as ClearLine},
     cursor::{Goto, Hide as HideCursor, Show as ShowCursor},
@@ -73,12 +77,42 @@ impl TUI {
         Ok(())
     }
 
+    /// Start thread to listen for keyboard events.
+    fn event_thread(&self) -> Result<Receiver<Key>, io::Error> {
+        let (sender, receiver) = unbounded();
+        thread::spawn(move || loop {
+            sender
+                .send(io::stdin().keys().next().unwrap().unwrap())
+                .unwrap()
+        });
+        Ok(receiver)
+    }
+
+    /// Register signal handler. SIGWINCH (resize) only for now.
+    fn signal_thread(&self) -> Result<Receiver<Key>, io::Error> {
+        let (sender, receiver) = unbounded();
+        unsafe {
+            signal_hook::register(signal_hook::SIGWINCH, move || {
+                sender.send(Key::F(5)).unwrap()
+            })
+        }?;
+
+        Ok(receiver)
+    }
+
     /// Main loop. Returns the host we want to SSH to, if any.
     pub fn run(&mut self) -> Result<Option<String>, io::Error> {
+        let ux_rx = self.event_thread()?;
+        let signal_rx = self.signal_thread()?;
+
         self.update(None)?;
         self.draw()?;
 
-        while let Some(Ok(event)) = io::stdin().keys().next() {
+        while let Ok(event) = Selector::new()
+            .recv(&ux_rx, |e| e)
+            .recv(&signal_rx, |e| e)
+            .wait()
+        {
             self.update(Some(event))?;
             match self.mode {
                 Mode::Quit => break,
