@@ -98,20 +98,8 @@ impl TUI {
 
         match event.unwrap() {
             Key::Ctrl('c') | Key::Esc if self.mode == Mode::Nav => self.mode = Mode::Quit,
-            Key::Up | Key::Ctrl('p') => {
-                if self.selected == 0 {
-                    self.selected = self.hosts.len() - 1;
-                } else {
-                    self.selected -= 1;
-                }
-            }
-            Key::Down | Key::Ctrl('n') => {
-                if self.selected >= self.hosts.len() - 1 {
-                    self.selected = 0;
-                } else {
-                    self.selected += 1;
-                }
-            }
+            Key::Up | Key::Ctrl('p') => self.select_prev(),
+            Key::Down | Key::Ctrl('n') => self.select_next(),
             Key::Char('\n') => {
                 if let Some(host) = self.hosts.iter().nth(self.selected) {
                     self.mode = Mode::Launch(host.0.clone());
@@ -121,7 +109,9 @@ impl TUI {
             }
             event if self.mode == Mode::Nav => match event {
                 Key::Char('q') => self.mode = Mode::Quit,
-                Key::Char('i') | Key::Char('s') | Key::Char('/') | Key::Char('f') => self.mode = Mode::Search,
+                Key::Char('i') | Key::Char('s') | Key::Char('/') | Key::Char('f') => {
+                    self.mode = Mode::Search
+                }
                 _ => {}
             },
             event if self.mode == Mode::Search => self.update_input(event),
@@ -145,6 +135,7 @@ impl TUI {
             Key::Backspace => {
                 if !self.input.is_empty() {
                     self.input.truncate(self.input.len() - 1);
+                    self.select_search_host();
                 }
                 if self.input.is_empty() {
                     self.status = SearchStatus::Blank;
@@ -152,12 +143,84 @@ impl TUI {
             }
             Key::Char(c) => {
                 self.input.push(c);
-                self.search_for_host();
+                self.select_search_host();
             }
             _ => {}
         }
     }
 
+    /// Select a host by index.
+    fn select(&mut self, i: usize) {
+        self.selected = i;
+        self.status = SearchStatus::Found;
+    }
+
+    /// Select the previous host (up). If we're in search mode, only
+    /// selects a matching host.
+    fn select_prev(&mut self) {
+        if self.mode == Mode::Search && !self.input.is_empty() {
+            let mut i = self.selected;
+            let hosts = self.hosts.iter().map(|(h, _)| h).collect::<Vec<_>>();
+            while i > 0 {
+                i -= 1;
+                if let Some(host) = hosts.get(i) {
+                    if Self::host_matches(host, &self.input) {
+                        self.select(i);
+                        return;
+                    }
+                }
+            }
+        } else {
+            if self.selected == 0 {
+                self.selected = self.hosts.len() - 1;
+            } else {
+                self.selected -= 1;
+            }
+        }
+    }
+
+    /// Select the previous host (up). If we're in search mode, only
+    /// selects a matching host.
+    fn select_next(&mut self) {
+        if self.mode == Mode::Search && !self.input.is_empty() {
+            let mut i = self.selected;
+            let hosts = self.hosts.iter().map(|(h, _)| h).collect::<Vec<_>>();
+            while i < hosts.len() {
+                i += 1;
+                if let Some(host) = hosts.get(i) {
+                    if Self::host_matches(host, &self.input) {
+                        self.select(i);
+                        return;
+                    }
+                }
+            }
+        } else {
+            if self.selected >= self.hosts.len() - 1 {
+                self.selected = 0;
+            } else {
+                self.selected += 1;
+            }
+        }
+    }
+
+    /// Checks the current self.input against hostnames to find and
+    /// select a match.
+    fn select_search_host(&mut self) {
+        for (i, (host, _)) in self.hosts.iter().enumerate() {
+            if Self::host_matches(host, &self.input) {
+                self.select(i);
+                return;
+            }
+        }
+
+        self.status = SearchStatus::Missed;
+    }
+
+    /// Does a given host match our search string? Just a prefix
+    /// match, for now.
+    fn host_matches(host: &str, search: &str) -> bool {
+        host.to_lowercase().starts_with(&search.to_lowercase())
+    }
     /// (bg, fg) colors for the prompt
     fn prompt_colors(&self) -> (&str, &str) {
         match self.status {
@@ -220,19 +283,6 @@ impl TUI {
 
         stdout.flush()?;
         Ok(())
-    }
-
-    /// Checks the current self.input against hostnames to find a match.
-    fn search_for_host(&mut self) {
-        for (i, (host, _)) in self.hosts.iter().enumerate() {
-            if host.to_lowercase().starts_with(&self.input.to_lowercase()) {
-                self.selected = i;
-                self.status = SearchStatus::Found;
-                return;
-            }
-        }
-
-        self.status = SearchStatus::Missed;
     }
 }
 
