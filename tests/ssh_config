@@ -1,0 +1,50 @@
+##
+# imaginary ssh config
+Host devserver,otherserver
+    Hostname devserver
+Host homework-server
+    Hostname homework-server
+# nixcraft
+Host nixcraft
+    HostName server1.cyberciti.biz
+    User nixcraft
+    Port 4242
+    IdentityFile /nfs/shared/users/nixcraft/keys/server1/id_rsa
+Host docker1
+    Hostname docker1
+# another comment
+Host nas01
+     HostName 192.168.1.100
+     User root
+     IdentityFile ~/.ssh/nas01.key
+Host docker2
+    Hostname docker2
+Host docker3
+    Hostname docker3
+Host docker*
+    IdentityFile ~/.ssh/docker.key
+Host devserver
+    Hostname devserver
+Host ec2-some-long-name.amazon.probably.com
+    Hostname ec2-1
+    User ec2-user
+Host ec2-some-long-namer.amazon.probably.com
+    Hostname ec2-2
+    User ec2-user
+Host uk.gw.lan uk.lan
+     HostName 192.168.0.251
+     User nixcraft
+     ProxyCommand  ssh nixcraft@gateway.uk.cyberciti.biz nc %h %p 2> /dev/null
+Host torrentz-server.io
+    Hostname torrentz-r-us.com
+Host midi-files.com
+    Hostname midiz-r-us.com
+Host *
+    ForwardAgent no
+    ForwardX11 no
+    ForwardX11Trusted yes
+    User nixcraft
+    Port 22
+    Protocol 2
+    ServerAliveInterval 60
+    ServerAliveCountMax 30
