@@ -23,6 +23,8 @@ pub struct TUI {
     status: SearchStatus,
     input: String,
     selected: usize,
+    offset: usize,
+    size: (u16, u16),
     hosts: HostMap,
     stdout: RawTerminal<Stdout>,
 }
@@ -51,6 +53,8 @@ impl TUI {
             status: SearchStatus::Blank,
             input: String::new(),
             selected: 0,
+            offset: 0,
+            size: terminal_size()?,
             hosts: load_ssh_config(config_path)?,
             stdout: Self::setup_terminal()?,
         })
@@ -132,6 +136,7 @@ impl TUI {
 
         match event.unwrap() {
             Key::Ctrl('c') | Key::Esc if self.mode == Mode::Nav => self.mode = Mode::Quit,
+            Key::Char('r') | Key::F(5) if self.mode == Mode::Nav => self.size = terminal_size()?,
             Key::Char(' ') | Key::PageDown => {
                 self.selected += 5;
                 if self.selected > self.hosts.len() - 1 {
@@ -200,6 +205,19 @@ impl TUI {
     fn select(&mut self, i: usize) {
         self.selected = i;
         self.status = SearchStatus::Found;
+        if !self.is_visible(self.selected) {
+            let rows = self.size.1 as usize - 2;
+            if self.selected == 0 {
+                self.offset = 0;
+            } else if self.selected > rows {
+                self.offset = self.selected - rows;
+            }
+        }
+    }
+
+    /// Is the host at the given index visible on screen?
+    fn is_visible(&self, i: usize) -> bool {
+        i >= self.offset && i < self.offset + (self.size.1 as usize - 1)
     }
 
     /// Select the previous host (up). If we're in search mode, only
@@ -224,6 +242,13 @@ impl TUI {
                 self.selected -= 1;
             }
         }
+        if !self.is_visible(self.selected) {
+            if self.selected > self.offset && self.selected > 5 {
+                self.offset = self.selected - 5;
+            } else {
+                self.offset = self.selected;
+            }
+        }
     }
 
     /// Select the previous host (up). If we're in search mode, only
@@ -246,6 +271,14 @@ impl TUI {
                 self.selected = 0;
             } else {
                 self.selected += 1;
+            }
+        }
+        if !self.is_visible(self.selected) {
+            let rows = self.size.1 as usize - 2;
+            if self.selected == 0 {
+                self.offset = 0;
+            } else if self.selected > rows {
+                self.offset = self.selected - rows;
             }
         }
     }
@@ -295,7 +328,7 @@ impl TUI {
 
     /// Draw the ui
     pub fn draw(&self) -> Result<(), io::Error> {
-        let (_cols, rows) = terminal_size()?;
+        let (_cols, rows) = self.size;
         let mut stdout = io::stdout();
 
         if self.mode == Mode::Search {
@@ -330,7 +363,11 @@ impl TUI {
         }
 
         let mut row = 1;
-        for (i, (host, _config)) in self.hosts.iter().enumerate() {
+        for (i, (host, _config)) in self.hosts.iter().enumerate().skip(self.offset) {
+            if i >= self.offset + (rows as usize - 1) {
+                break;
+            }
+
             write!(
                 stdout,
                 "{}{}",
