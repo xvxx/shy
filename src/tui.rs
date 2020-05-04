@@ -243,8 +243,9 @@ impl TUI {
             }
         }
         if !self.is_visible(self.selected) {
-            if self.selected > self.offset && self.selected > 5 {
-                self.offset = self.selected - 5;
+            let rows = self.size.1 as usize - 2;
+            if self.selected > self.offset && self.selected > rows {
+                self.offset = self.selected - rows;
             } else {
                 self.offset = self.selected;
             }
