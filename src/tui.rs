@@ -221,6 +221,22 @@ impl TUI {
     fn host_matches(host: &str, search: &str) -> bool {
         host.to_lowercase().starts_with(&search.to_lowercase())
     }
+
+    /// The hostname of the currently selected host pattern. The two
+    /// might be different.
+    fn selected_hostname(&self) -> &str {
+        if let Some((_, (_, hostname))) = self
+            .hosts
+            .iter()
+            .enumerate()
+            .find(|(i, _)| *i == self.selected)
+        {
+            hostname
+        } else {
+            "shy"
+        }
+    }
+
     /// (bg, fg) colors for the prompt
     fn prompt_colors(&self) -> (&str, &str) {
         match self.status {
@@ -262,7 +278,7 @@ impl TUI {
                 color!(MagentaBG),
                 color!(Yellow),
                 ClearLine,
-                color_string!("shy", MagentaBG, Yellow, Bold)
+                color_string!(self.selected_hostname(), MagentaBG, Yellow, Bold)
             )?;
         }
 
