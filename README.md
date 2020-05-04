@@ -1,5 +1,7 @@
 # shy
 
+[![crate](https://img.shields.io/crates/v/shy)](https://crates.io/crates/shy)
+
 `shy` is a lil console ui for quickly connecting to an ssh server. It
 parses your `~/.ssh/config` file and displays all your "Host" patterns,
 allowing you to quickly select one using a readline-ish prompt.
@@ -31,7 +33,7 @@ file, you can now run:
 
 | ![Screenshot](./img/screen1.jpeg) | ![Screenshot](./img/screen2.jpeg) |
 | :-------------------------------: | :-------------------------------: |
-|                Nav                |            Search.com             |
+|                nav                |              search               |
 
 ## TODO
 
