@@ -136,7 +136,13 @@ impl TUI {
 
         match event.unwrap() {
             Key::Ctrl('c') | Key::Esc if self.mode == Mode::Nav => self.mode = Mode::Quit,
-            Key::Char('r') | Key::F(5) if self.mode == Mode::Nav => self.size = terminal_size()?,
+            Key::Char('r') | Key::F(5) if self.mode == Mode::Nav => {
+                self.size = terminal_size()?;
+                // reset offset if the screen grew
+                if self.offset > 0 && self.hosts.len() <= self.size.1 as usize {
+                    self.offset = 0;
+                }
+            }
             Key::Char(' ') | Key::PageDown => {
                 self.selected += 5;
                 if self.selected > self.hosts.len() - 1 {
