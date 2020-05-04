@@ -148,6 +148,7 @@ impl TUI {
                 if self.selected > self.hosts.len() - 1 {
                     self.selected = self.hosts.len() - 1;
                 }
+                self.select(self.selected);
             }
             Key::Char('-') | Key::PageUp => {
                 if self.selected > 5 {
@@ -155,6 +156,7 @@ impl TUI {
                 } else {
                     self.selected = 0;
                 }
+                self.select(self.selected);
             }
             Key::Up | Key::Ctrl('p') => self.select_prev(),
             Key::Down | Key::Ctrl('n') => self.select_next(),
@@ -168,6 +170,7 @@ impl TUI {
             event if self.mode == Mode::Nav => match event {
                 Key::Char('q') => self.mode = Mode::Quit,
                 Key::Char('i') | Key::Char('s') | Key::Char('/') | Key::Char('f') => {
+                    self.status = SearchStatus::Blank;
                     self.mode = Mode::Search
                 }
                 _ => {}
@@ -215,6 +218,8 @@ impl TUI {
             let rows = self.size.1 as usize - 2;
             if self.selected == 0 {
                 self.offset = 0;
+            } else if self.selected < self.offset {
+                self.offset = self.selected;
             } else if self.selected > rows {
                 self.offset = self.selected - rows;
             }
