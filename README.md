@@ -25,20 +25,18 @@ file, you can now run:
 | `up`, `ctrl-p`     | Move selection up   | Jump to previous match             |
 | `down`, `ctrl-n`   | Move selection down | Jump to next match                 |
 
+
+## Screenies
+
+| Nav | Search |
+| --- | --- |
+| <img src="./img/screen1.jpeg"> |<img src="./img/screen2.jpeg">  |
+
 ## TODO
 
-### Core
-
 - [ ] correctly parse .ssh/config
+- [ ] config parsing
 - [ ] show actual hostnames in status bar
-
-### Fancy
-
-- [ ] screenshot for README
 - [ ] screencast for README
-- [ ] publish as crate
-- [ ] usage in README
-- [ ] installation in README
-- [ ] tests
 
 [cargo]: https://rustup.rs/
