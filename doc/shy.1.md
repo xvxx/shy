@@ -62,15 +62,17 @@ _Up arrow_, _Ctrl-p_, _k_
 _Down arrow_, _Ctrl-n_, _j_
 	Select next host in list.
 _Page Down_, _Spacebar_
-	Jump down by 5 entries
+	Jump down by five entries.
 _Page Up_, _-_
-	Jump up by 5 entries
+	Jump up by five entries.
 
 _Enter_
 	Connect to selected host.
 
 _i_, _s_, _/_, _f_
 	Enter search mode.
+_r_, _F5_
+	Refresh view.
 
 ## SEARCH MODE KEYBOARD SHORTCUTS
 

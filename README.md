@@ -31,7 +31,7 @@ mode:
 | `down`, `ctrl-n`    | Move selection down | Jump to next match                 |
 | `PageDown`, `space` | Jump down 5 entries |                                    |
 | `PageUp`, `-`       | Jump up 5 entries   |                                    |
-| `r`                 | Refresh             |                                    |
+| `r`, `F5`           | Refresh             |                                    |
 | `ctrl-c`, `ESC`     | Quit                | Clear Input, then Exit Search Mode |
 
 ## screenies
