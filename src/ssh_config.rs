@@ -61,6 +61,7 @@ pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> 
                         // skip any Host patterns
                         if parsed.contains('*')
                             || parsed.contains('!')
+                            || parsed.contains('?')
                             || parsed.contains(',')
                             || parsed.contains(' ')
                         {
