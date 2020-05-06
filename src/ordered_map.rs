@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, ops::Deref};
 
-struct OrderedMap<K, V> {
+pub struct OrderedMap<K, V> {
     pub keys: Vec<K>,
     pub values: HashMap<K, V>,
 }
@@ -21,6 +21,9 @@ where
 
     /// Insert a key/value pair.
     pub fn insert(&mut self, key: K, val: V) {
+        if let Some(idx) = self.keys.iter().position(|k| k == &key) {
+            self.keys.remove(idx);
+        }
         self.keys.push(key.clone());
         self.values.insert(key, val);
     }
@@ -35,6 +38,19 @@ where
         }
         self.values.remove(key)
     }
+
+    /// Just the keys. In order.
+    // pub fn keys(&self) -> Vec<K> {}
+    pub fn keys(&self) -> Keys<K> {
+        Keys {
+            inner: self.keys.iter(),
+        }
+    }
+
+    /// Create an iterator.
+    pub fn iter(&self) -> OrderedMapIterator<K, V> {
+        self.into_iter()
+    }
 }
 
 impl<K, V> Deref for OrderedMap<K, V> {
@@ -45,7 +61,18 @@ impl<K, V> Deref for OrderedMap<K, V> {
     }
 }
 
-struct OrderedMapIterator<'m, K, V> {
+pub struct Keys<'m, K> {
+    inner: std::slice::Iter<'m, K>,
+}
+
+impl<'m, K> Iterator for Keys<'m, K> {
+    type Item = &'m K;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next()
+    }
+}
+
+pub struct OrderedMapIterator<'m, K, V> {
     map: &'m OrderedMap<K, V>,
     curr: usize,
 }
@@ -56,17 +83,14 @@ where
 {
     type Item = (&'m K, &'m V);
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr >= self.map.len() {
-            None
-        } else {
+        if self.curr < self.map.len() {
             let key = &self.map.keys[self.curr];
             if let Some(val) = self.map.values.get(&key) {
                 self.curr += 1;
-                Some((&key, val))
-            } else {
-                None
+                return Some((key, val));
             }
         }
+        None
     }
 }
 
@@ -100,6 +124,8 @@ mod tests {
         for (_k, v) in &map {
             assert_eq!(&vals.remove(0), v);
         }
+
+        assert_eq!(vec!["first", "last", "age"], map.keys().collect::<Vec<_>>());
     }
 
     #[test]
