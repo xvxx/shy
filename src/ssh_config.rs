@@ -1,16 +1,17 @@
-use std::{collections::BTreeMap, fs, io};
+use crate::OrderedMap;
+use std::{fs, io};
 
-pub type HostMap = BTreeMap<String, String>;
+pub type HostMap = OrderedMap<String, String>;
 
 /// For now just load the hostnames and their labels.
 pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
     parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
 }
 
-/// Parse .ssh/config to a (sorted) BTree.
+/// Parse .ssh/config to a (sorted) map.
 pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> {
     let config = config.as_ref();
-    let mut map = BTreeMap::new();
+    let mut map = HostMap::new();
 
     let mut token = String::new(); // the token we're parsing
     let mut line = vec![]; // current line
@@ -106,17 +107,17 @@ mod tests {
         assert_eq!(
             config.keys().cloned().collect::<Vec<_>>(),
             vec![
-                "devserver",
+                "homework-server",
+                "nixcraft",
                 "docker1",
+                "nas01",
                 "docker2",
                 "docker3",
+                "devserver",
                 "ec2-some-long-name.amazon.probably.com",
                 "ec2-some-long-namer.amazon.probably.com",
-                "homework-server",
-                "midi-files.com",
-                "nas01",
-                "nixcraft",
                 "torrentz-server",
+                "midi-files.com",
             ]
         );
         assert_eq!("torrentz-r-us.com", config.get("torrentz-server").unwrap());
