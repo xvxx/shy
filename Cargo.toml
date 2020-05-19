@@ -23,5 +23,5 @@ dev-version-ext = "dev"
 
 [dependencies]
 termion = "1.5.5"
-flume = "0.7.1"
+flume = { version = "0.7.1", default-features = false, features = ['select'] }
 signal-hook = "0.1.14"
