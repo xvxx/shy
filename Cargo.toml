@@ -25,3 +25,4 @@ dev-version-ext = "dev"
 termion = "1.5.5"
 flume = { version = "0.7.1", default-features = false, features = ['select'] }
 signal-hook = "0.1.14"
+indexmap = "1.3.2"

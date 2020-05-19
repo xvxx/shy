@@ -1,7 +1,7 @@
-use crate::OrderedMap;
+use indexmap::IndexMap;
 use std::{fs, io};
 
-pub type HostMap = OrderedMap<String, String>;
+pub type HostMap = IndexMap<String, String>;
 
 /// For now just load the hostnames and their labels.
 pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
