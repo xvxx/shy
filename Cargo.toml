@@ -1,6 +1,6 @@
 [package]
 name = "shy"
-version = "0.1.6-dev"
+version = "0.1.6"
 authors = ["chris west <c@xvxx.io>"]
 description = "barebones ssh launcher"
 repository = "https://github.com/xvxx/shy"

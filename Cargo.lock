@@ -59,7 +59,7 @@ dependencies = [
 
 [[package]]
 name = "shy"
-version = "0.1.6-dev"
+version = "0.1.6"
 dependencies = [
  "flume",
  "indexmap",
