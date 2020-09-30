@@ -1,7 +1,7 @@
 use shy::App;
 use std::{io, os::unix::process::CommandExt, panic, process::Command};
 
-fn main() -> Result<(), io::Error> {
+fn main() -> io::Result<()> {
     let mut config_path = "~/.ssh/config";
     let mut search_mode = false;
 
@@ -38,7 +38,7 @@ fn main() -> Result<(), io::Error> {
 }
 
 /// Run the app, optionally returning a host to SSH to.
-fn run(config_path: &str, search_mode: bool) -> Result<Option<String>, io::Error> {
+fn run(config_path: &str, search_mode: bool) -> io::Result<Option<String>> {
     setup_panic_hook();
     let mut app = App::new(config_path)?;
     if search_mode {
@@ -55,7 +55,7 @@ fn setup_panic_hook() {
 }
 
 /// Converts -c=file into ["-c", "file"]
-fn parse_args() -> Result<Vec<String>, io::Error> {
+fn parse_args() -> io::Result<Vec<String>> {
     let mut args = vec![];
     for arg in std::env::args().skip(1).collect::<Vec<String>>() {
         if arg.starts_with('-') && arg.contains('=') {
@@ -70,7 +70,7 @@ fn parse_args() -> Result<Vec<String>, io::Error> {
 }
 
 /// --help
-fn print_usage() -> Result<(), io::Error> {
+fn print_usage() -> io::Result<()> {
     println!(
         "Usage: shy [options]
 
@@ -84,7 +84,7 @@ Options:
 }
 
 /// --version
-fn print_version() -> Result<(), io::Error> {
+fn print_version() -> io::Result<()> {
     println!("shy v{}", shy::VERSION);
     Ok(())
 }

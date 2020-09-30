@@ -48,7 +48,7 @@ pub enum SearchStatus {
 
 impl TUI {
     /// Create a new main view and sets up the terminal.
-    pub fn new(config_path: &str) -> Result<TUI, io::Error> {
+    pub fn new(config_path: &str) -> io::Result<TUI> {
         Ok(TUI {
             mode: Mode::Nav,
             status: SearchStatus::Blank,
@@ -62,7 +62,7 @@ impl TUI {
     }
 
     /// Put the terminal into raw mode, hide the cursor, etc.
-    fn setup_terminal() -> Result<RawTerminal<Stdout>, io::Error> {
+    fn setup_terminal() -> io::Result<RawTerminal<Stdout>> {
         let mut stdout = io::stdout().into_raw_mode()?;
         write!(stdout, "{}", ToAlternateScreen)?;
         write!(stdout, "{}", HideCursor)?;
@@ -74,7 +74,7 @@ impl TUI {
 
     /// Restore the terminal to its prior state.
     /// We run this on drop().
-    fn cleanup_terminal(&mut self) -> Result<(), io::Error> {
+    fn cleanup_terminal(&mut self) -> io::Result<()> {
         self.stdout.suspend_raw_mode()?;
         write!(self.stdout, "{}", ShowCursor)?;
         write!(self.stdout, "{}", ToMainScreen)?;
@@ -83,7 +83,7 @@ impl TUI {
     }
 
     /// Start thread to listen for keyboard events.
-    fn event_thread(&self) -> Result<Receiver<Key>, io::Error> {
+    fn event_thread(&self) -> io::Result<Receiver<Key>> {
         let (sender, receiver) = unbounded();
         thread::spawn(move || loop {
             sender
@@ -94,7 +94,7 @@ impl TUI {
     }
 
     /// Register signal handler. SIGWINCH (resize) only for now.
-    fn signal_thread(&self) -> Result<Receiver<Key>, io::Error> {
+    fn signal_thread(&self) -> io::Result<Receiver<Key>> {
         let (sender, receiver) = unbounded();
         unsafe {
             signal_hook::register(signal_hook::SIGWINCH, move || {
@@ -106,7 +106,7 @@ impl TUI {
     }
 
     /// Main loop. Returns the host we want to SSH to, if any.
-    pub fn run(&mut self) -> Result<Option<String>, io::Error> {
+    pub fn run(&mut self) -> io::Result<Option<String>> {
         let ux_rx = self.event_thread()?;
         let signal_rx = self.signal_thread()?;
 
@@ -130,7 +130,7 @@ impl TUI {
     }
 
     /// Update our state in response to key presses.
-    pub fn update(&mut self, event: Option<Key>) -> Result<(), io::Error> {
+    pub fn update(&mut self, event: Option<Key>) -> io::Result<()> {
         if event.is_none() {
             return Ok(());
         }
@@ -356,7 +356,7 @@ impl TUI {
     }
 
     /// Draw the ui
-    pub fn draw(&self) -> Result<(), io::Error> {
+    pub fn draw(&self) -> io::Result<()> {
         let (_cols, rows) = self.size;
         let mut stdout = io::stdout();
 

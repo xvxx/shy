@@ -4,12 +4,12 @@ use std::{fs, io};
 pub type HostMap = IndexMap<String, String>;
 
 /// For now just load the hostnames and their labels.
-pub fn load_ssh_config(path: &str) -> Result<HostMap, io::Error> {
+pub fn load_ssh_config(path: &str) -> io::Result<HostMap> {
     parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
 }
 
 /// Parse .ssh/config to a (sorted) map.
-pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> Result<HostMap, io::Error> {
+pub fn parse_ssh_config<S: AsRef<str>>(config: S) -> io::Result<HostMap> {
     let config = config.as_ref();
     let mut map = HostMap::new();
 
