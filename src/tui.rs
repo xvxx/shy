@@ -3,6 +3,7 @@ use crate::{
     ssh_config::{load_ssh_config, HostMap},
 };
 use flume::{unbounded, Receiver, Selector};
+use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
 use std::{
     io::{self, Stdout, Write},
     thread,
@@ -27,6 +28,7 @@ pub struct TUI {
     size: (u16, u16),
     hosts: HostMap,
     stdout: RawTerminal<Stdout>,
+    matcher: SkimMatcherV2,
 }
 
 /// UI mode
@@ -58,6 +60,7 @@ impl TUI {
             size: terminal_size()?,
             hosts: load_ssh_config(config_path)?,
             stdout: Self::setup_terminal()?,
+            matcher: Default::default(),
         })
     }
 
@@ -243,7 +246,7 @@ impl TUI {
             while i > 0 {
                 i -= 1;
                 if let Some(host) = hosts.get(i) {
-                    if Self::host_matches(host, &self.input) {
+                    if self.host_matches(host, &self.input) {
                         self.select(i);
                         return;
                     }
@@ -275,7 +278,7 @@ impl TUI {
             while i < hosts.len() {
                 i += 1;
                 if let Some(host) = hosts.get(i) {
-                    if Self::host_matches(host, &self.input) {
+                    if self.host_matches(host, &self.input) {
                         self.select(i);
                         return;
                     }
@@ -302,7 +305,7 @@ impl TUI {
     /// select a match.
     fn select_search_host(&mut self) {
         for (i, (host, _)) in self.hosts.iter().enumerate() {
-            if Self::host_matches(host, &self.input) {
+            if self.host_matches(host, &self.input) {
                 self.select(i);
                 return;
             }
@@ -313,8 +316,8 @@ impl TUI {
 
     /// Does a given host match our search string? Just a prefix
     /// match, for now.
-    fn host_matches(host: &str, search: &str) -> bool {
-        host.to_lowercase().starts_with(&search.to_lowercase())
+    fn host_matches(&self, host: &str, search: &str) -> bool {
+        self.matcher.fuzzy_match(host, search).is_some()
     }
 
     /// The name of the currently selected host pattern.

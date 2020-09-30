@@ -1,3 +1,7 @@
+## 0.1.8-dev
+
+- Search is now a fuzzy-find instead of a literal match! Thanks [fuzzy-matcher](https://crates.io/crates/fuzzy-matcher).
+
 ## 0.1.7
 
 - Fix for dependencies getting out of sync.
