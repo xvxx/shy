@@ -1,4 +1,4 @@
-## 0.1.8-dev
+## 0.1.8
 
 - Search is now a fuzzy-find instead of a literal match! Thanks [fuzzy-matcher](https://crates.io/crates/fuzzy-matcher).
 

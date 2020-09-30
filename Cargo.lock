@@ -74,7 +74,7 @@ dependencies = [
 
 [[package]]
 name = "shy"
-version = "0.1.8-dev"
+version = "0.1.8"
 dependencies = [
  "flume",
  "fuzzy-matcher",
