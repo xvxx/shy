@@ -2,7 +2,7 @@
 name = "shy"
 version = "0.1.9-dev"
 authors = ["chris west <c@xvxx.io>"]
-description = "barebones ssh launcher"
+description = "bare-bones ssh launcher"
 repository = "https://github.com/xvxx/shy"
 readme = "README.md"
 edition = "2018"
