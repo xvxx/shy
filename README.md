@@ -22,6 +22,12 @@ mode:
 
     shy -s
 
+### arch linux
+
+`shy` can be installed from available [AUR packages](https://aur.archlinux.org/packages/?O=0&SeB=nd&K=Bare-bones+SSH+launcher&outdated=&SB=n&SO=a&PP=50&do_Search=Go) using an [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers). For example,
+
+    yay -S shy
+
 ## keyboard shortcuts
 
 | **Shortcut**        | **Nav Mode**        | **Search Mode**                    |
