@@ -1,6 +1,6 @@
 # shy
 
-[![github](https://img.shields.io/github/v/release/xvxx/shy)](https://github.com/xvxx/shy/releases)
+[![github](https://img.shields.io/github/v/release/xvxx/shy?include_prereleases)](https://github.com/xvxx/shy/releases)
 [![crate](https://img.shields.io/crates/v/shy)](https://crates.io/crates/shy)
 [![aur](https://img.shields.io/aur/version/shy)](https://aur.archlinux.org/packages/shy/)
 [![build](https://github.com/xvxx/shy/workflows/build/badge.svg)](https://github.com/xvxx/shy/actions?query=workflow%3Abuild)
