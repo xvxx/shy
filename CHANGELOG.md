@@ -1,4 +1,4 @@
-## 0.1.9-dev
+## 0.1.9
 
 - The status bar now appropriately highlights fuzzy matches.
 
