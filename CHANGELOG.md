@@ -1,3 +1,7 @@
+## 0.1.9-dev
+
+- The status bar now appropriately highlights fuzzy matches.
+
 ## 0.1.8
 
 - Search is now a fuzzy-find instead of a literal match! Thanks [fuzzy-matcher](https://crates.io/crates/fuzzy-matcher).
