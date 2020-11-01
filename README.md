@@ -7,29 +7,34 @@
 
 `shy` is a lil console ui for quickly connecting to an ssh server. It
 parses your `~/.ssh/config` file and displays all your "Host" patterns,
-allowing you to quickly select one using a readline-ish prompt.
+allowing you to quickly select one using a fuzzy finder prompt.
 
 ## install
 
-If you have [cargo] installed, installation is a breeze:
+On macOS you can install with [Homebrew](https://brew.sh/):
 
-    cargo install shy
+    brew install xvxx/code/shy
 
-Assuming you have `~/.cargo/bin` in your `$PATH` and a `~/.ssh/config`
-file, you can now run:
-
-    shy
-
-To connect more quickly to a host, you may want to launch in search
-mode:
-
-    shy -s
-
-### arch linux
-
-`shy` can be installed from available [AUR packages](https://aur.archlinux.org/packages/?O=0&SeB=nd&K=Bare-bones+SSH+launcher&outdated=&SB=n&SO=a&PP=50&do_Search=Go) using an [AUR helper](https://wiki.archlinux.org/index.php/AUR_helpers). For example,
+On Arch Linux, install shy with your favorite [AUR helper][aur]:
 
     yay -S shy
+
+Binaries for Linux, Raspberry Pi, and Mac are available at
+https://github.com/xvxx/shy/releases:
+
+- [shy-v0.1.9-linux-x86_64.tgz][0]
+- [shy-v0.1.9-linux-armv7.tgz (Raspberry Pi)][1]
+- [shy-v0.1.9-macos.zip][2]
+
+## usage
+
+    Usage: shy [options]
+
+    Options:
+        -c, --config FILE    Use FILE instead of ~/.ssh/config
+        -s, --search         Start in Search mode.
+        -v, --version        Print shy version and exit.
+        -h, --help           Show this message.
 
 ## keyboard shortcuts
 
@@ -49,8 +54,5 @@ mode:
 | --------------------------------- | --------------------------------- |
 | ![Screenshot](./img/screen3.jpeg) | ![Screenshot](./img/screen4.jpeg) |
 
-## TODO
-
-- [ ] screencast for README
-
 [cargo]: https://rustup.rs/
+[aur]: https://wiki.archlinux.org/index.php/AUR_helpers
