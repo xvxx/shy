@@ -1,5 +1,7 @@
-use indexmap::IndexMap;
-use std::{fs, io};
+use {
+    indexmap::IndexMap,
+    std::{fs, io},
+};
 
 pub type HostMap = IndexMap<String, String>;
 

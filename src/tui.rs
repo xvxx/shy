@@ -1,21 +1,23 @@
-use crate::{
-    color,
-    ssh_config::{load_ssh_config, HostMap},
-};
-use flume::{unbounded, Receiver, Selector};
-use fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher};
-use std::{
-    io::{self, Stdout, Write},
-    thread,
-};
-use termion::{
-    clear::{All as ClearAll, CurrentLine as ClearLine},
-    cursor::{Goto, Hide as HideCursor, Show as ShowCursor},
-    event::Key,
-    input::TermRead,
-    raw::{IntoRawMode, RawTerminal},
-    screen::{ToAlternateScreen, ToMainScreen},
-    terminal_size,
+use {
+    crate::{
+        color,
+        ssh_config::{load_ssh_config, HostMap},
+    },
+    flume::{unbounded, Receiver, Selector},
+    fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher},
+    std::{
+        io::{self, Stdout, Write},
+        thread,
+    },
+    termion::{
+        clear::{All as ClearAll, CurrentLine as ClearLine},
+        cursor::{Goto, Hide as HideCursor, Show as ShowCursor},
+        event::Key,
+        input::TermRead,
+        raw::{IntoRawMode, RawTerminal},
+        screen::{ToAlternateScreen, ToMainScreen},
+        terminal_size,
+    },
 };
 
 /// App state.

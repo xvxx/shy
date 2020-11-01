@@ -1,5 +1,7 @@
-use shy::App;
-use std::{io, os::unix::process::CommandExt, panic, process::Command};
+use {
+    shy::App,
+    std::{io, os::unix::process::CommandExt, panic, process::Command},
+};
 
 fn main() -> io::Result<()> {
     let mut config_path = "~/.ssh/config";
