@@ -6,6 +6,7 @@ use {
     flume::{unbounded, Receiver, Selector},
     fuzzy_matcher::{skim::SkimMatcherV2, FuzzyMatcher},
     std::{
+        borrow::Cow,
         io::{self, Stdout, Write},
         thread,
     },
@@ -367,27 +368,16 @@ impl TUI {
 
         if self.mode == Mode::Search {
             let (bg, fg) = self.prompt_colors();
-            let hint = if self.status == SearchStatus::Found {
-                &self.selected_name()[self.input.len()..]
-            } else {
-                ""
-            };
-
             write!(
                 stdout,
-                "{}{}{}{}{}{}{}{}{}{}{}{}{}",
+                "{}{}{}{}{}{}{}{}",
                 ClearAll,
                 Goto(1, rows),
                 bg,
                 fg,
                 ClearLine,
-                color!(Bold),
                 ">> ",
-                self.input,
-                color!(Reset),
-                bg,
-                fg,
-                hint,
+                self.highlight_matches()?,
                 color!(Reset),
             )?;
         } else {
@@ -424,6 +414,32 @@ impl TUI {
 
         stdout.flush()?;
         Ok(())
+    }
+
+    /// Highlight (embolden) the matching letters in a host, which may
+    /// not be consecutive since we use fuzzy finding.
+    fn highlight_matches(&self) -> io::Result<Cow<str>> {
+        if self.input.is_empty() {
+            return Ok(Cow::from(""));
+        }
+
+        let mut out = String::new();
+        let mut host = self.selected_name();
+        for c in self.input.chars() {
+            if let Some(idx) = host.find(c) {
+                if idx > 0 {
+                    out.push_str(&host[..idx]);
+                }
+                out.push_str("\x1b[1m");
+                out.push(c);
+                out.push_str("\x1b[22m");
+                host = &host[idx + 1..];
+            }
+        }
+        if !host.is_empty() {
+            out.push_str(host);
+        }
+        Ok(Cow::from(out))
     }
 }
 
