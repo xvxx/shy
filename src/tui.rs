@@ -423,6 +423,10 @@ impl TUI {
             return Ok(Cow::from(""));
         }
 
+        if self.status == SearchStatus::Missed {
+            return Ok(Cow::from(&self.input));
+        }
+
         let mut out = String::new();
         let mut host = self.selected_name();
         for c in self.input.chars() {
