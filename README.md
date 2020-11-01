@@ -26,6 +26,10 @@ https://github.com/xvxx/shy/releases:
 - [shy-v0.1.9-linux-armv7.tgz (Raspberry Pi)][1]
 - [shy-v0.1.9-macos.zip][2]
 
+You can also install directly from crates.io:
+
+    cargo install shy
+
 ## usage
 
     Usage: shy [options]
