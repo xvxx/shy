@@ -1,13 +1,15 @@
 use {
     indexmap::IndexMap,
-    std::{fs, io},
+    std::{env, fs, io},
 };
 
 pub type HostMap = IndexMap<String, String>;
 
 /// For now just load the hostnames and their labels.
 pub fn load_ssh_config(path: &str) -> io::Result<HostMap> {
-    parse_ssh_config(&fs::read_to_string(path.replace('~', env!("HOME")))?)
+    parse_ssh_config(&fs::read_to_string(
+        path.replace('~', &env::var("HOME").expect("$HOME must be set")),
+    )?)
 }
 
 /// Parse .ssh/config to a (sorted) map.
