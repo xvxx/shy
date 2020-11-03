@@ -1,3 +1,7 @@
+## 0.1.10-dev
+
+- Fixes a bug in $HOME detection.
+
 ## 0.1.9
 
 - The status bar now appropriately highlights fuzzy matches.
