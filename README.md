@@ -22,9 +22,9 @@ On Arch Linux, install shy with your favorite [AUR helper][aur]:
 Binaries for Linux, Raspberry Pi, and Mac are available at
 https://github.com/xvxx/shy/releases:
 
-- [shy-v0.1.9-linux-x86_64.tgz][0]
-- [shy-v0.1.9-linux-armv7.tgz (Raspberry Pi)][1]
-- [shy-v0.1.9-macos.zip][2]
+- [shy-v0.1.10-linux-x86_64.tgz][0]
+- [shy-v0.1.10-linux-armv7.tgz (Raspberry Pi)][1]
+- [shy-v0.1.10-macos.zip][2]
 
 You can also install directly from crates.io:
 
