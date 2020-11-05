@@ -60,3 +60,6 @@ You can also install directly from crates.io:
 
 [cargo]: https://rustup.rs/
 [aur]: https://wiki.archlinux.org/index.php/AUR_helpers
+[0]: https://github.com/xvxx/shy/releases/download/v0.1.10/shy-v0.1.10-linux-x86_64.tgz
+[1]: https://github.com/xvxx/shy/releases/download/v0.1.10/shy-v0.1.10-linux-armv7.tgz
+[2]: https://github.com/xvxx/shy/releases/download/v0.1.10/shy-v0.1.10-macos.zip
