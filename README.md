@@ -15,9 +15,9 @@ On macOS you can install with [Homebrew](https://brew.sh/):
 
     brew install xvxx/code/shy
 
-On Arch Linux, install shy with your favorite [AUR helper][aur]:
+On Arch Linux, install using [Pacman](https://wiki.archlinux.org/index.php/Pacman):
 
-    yay -S shy
+    pacman -S shy
 
 Binaries for Linux, Raspberry Pi, and Mac are available at
 https://github.com/xvxx/shy/releases:
