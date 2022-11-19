@@ -28,12 +28,23 @@ fn main() -> io::Result<()> {
         }
     }
 
-    if let Some(hostname) = run(config_path, search_mode)? {
-        std::env::set_var("TERM", "xterm"); // TODO xterm-kitty hack
-        let mut cmd = Command::new("ssh");
-        let cmd = cmd.arg(hostname);
-        let err = cmd.exec();
-        eprintln!("{:?}", err);
+    match run(config_path, search_mode) {
+        Ok(None) => {}
+        Err(e) => {
+            if matches!(e.kind(), io::ErrorKind::NotFound) {
+                eprintln!("error: ~/.ssh/config not found");
+            } else {
+                eprintln!("{}", e);
+            }
+            std::process::exit(1);
+        }
+        Ok(Some(hostname)) => {
+            std::env::set_var("TERM", "xterm"); // TODO xterm-kitty hack
+            let mut cmd = Command::new("ssh");
+            let cmd = cmd.arg(hostname);
+            let err = cmd.exec();
+            eprintln!("{:?}", err);
+        }
     }
 
     Ok(())
